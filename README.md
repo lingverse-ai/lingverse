@@ -1,6 +1,4 @@
-<!-- 灵境主视觉：assets/hero.png 做好后，取消下面这行的注释
 <p align="center"><img src="assets/hero.png" alt="灵境 Lingverse" width="100%"></p>
--->
 
 <h1 align="center">灵境 Lingverse</h1>
 
