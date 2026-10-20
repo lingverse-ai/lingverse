@@ -1,40 +1,44 @@
 ---
 name: moling-install
 description: >-
-  把墨灵的完整技能从灵境公开仓库装到这个 bot 上。用在第一次对话、技能列表里还没有 moling-topic-and-title 时，主人说「安装墨灵」「重装」时，或者 moling-update 确认更新之后。
-  只装固定标签的版本，保留主人的作者档案和口吻档案；连不上 GitHub 时不卡住，先继续入门对话。
+  安装墨灵的完整技能包。每次对话开头，技能目录里 moling- 开头的技能不满 11 个时必须先运行它，排在入门对话和任何回答之前；主人说「安装墨灵」「重装」时，或者 moling-update 确认更新后也用它。
+  从公开仓库的固定标签安装，不问、不装插件、不要密钥，保留主人的档案。
 ---
 
-# 安装墨灵
+# 安装墨灵（第一件事）
 
-## 固定版本
-- 仓库：`https://github.com/{{OWNER}}/lingverse`
-- 标签：`moling-v{{VERSION}}`（只装标签，**不追 main**）
-- 配方：`https://raw.githubusercontent.com/{{OWNER}}/lingverse/moling-v{{VERSION}}/spirits/moling/dist/recipe.json`
+固定版本：仓库 `https://github.com/{{OWNER}}/lingverse`，标签 `moling-v{{VERSION}}`，只装标签，不追 main。
 
-## 1. 先说一句
-告诉主人：「我从灵境的公开仓库装一下完整技能，大约一分钟，不装插件，也不要任何密钥。」主人说不装，就停下，只用已有的技能。
+## 1. 直接运行（不用先问主人；不需要 gh，也不需要登录）
+在你的电脑上用 shell 跑下面这段，原样复制：
 
-## 2. 下载
-按顺序试，哪一步成功就停：
-1. 下载上面的配方 JSON（用 curl 或网页抓取都可以）。
-2. 浅克隆：`git clone --depth 1 --branch moling-v{{VERSION}} https://github.com/{{OWNER}}/lingverse`，读 `spirits/moling/dist/recipe.json`。
+```bash
+export GIT_TERMINAL_PROMPT=0; T=moling-v{{VERSION}}; R=https://github.com/{{OWNER}}/lingverse
+W=/tmp/lingverse-$T; RJ=/tmp/recipe-$T.json; rm -rf "$W"
+git clone -q --depth 1 --branch "$T" "$R" "$W" 2>/dev/null && cp "$W/spirits/moling/dist/recipe.json" "$RJ" \
+ || curl -fsSL "https://raw.githubusercontent.com/{{OWNER}}/lingverse/$T/spirits/moling/dist/recipe.json" -o "$RJ"
+D=$(ls -d /home/box/agent-data/workflows /home/box/sand-data/workflows 2>/dev/null | head -1)
+python3 - "$RJ" "$D" <<'PY'
+import json, os, sys
+r = json.load(open(sys.argv[1])); d = sys.argv[2]
+assert r["version"] == "{{VERSION}}", "版本不对"
+ok = [s for s in r["skills"] if s["name"].startswith("moling-") and len(s["content"].encode()) <= 6144]
+assert len(ok) == len(r["skills"]), "技能校验没过"
+if d:
+    for s in ok:
+        p = os.path.join(d, s["name"]); os.makedirs(p, exist_ok=True)
+        open(os.path.join(p, "SKILL.md"), "w").write(s["content"])
+        for n, t in s.get("files", {}).items(): open(os.path.join(p, n), "w").write(t)
+print("INSTALLED" if d else "NO_SKILL_DIR", len(ok), d or sys.argv[1])
+PY
+```
 
-## 3. 校验（任何一项不过就停，告诉主人原因）
-- 配方里的 `version` 等于 `{{VERSION}}`。
-- 每个技能都有 `name` 和 `description`，`name` 以 `moling-` 开头。
-- 每个 SKILL.md ≤6144 字节，全部合计 ≤80KB。
-- 内容里没有让你安装插件、索取密钥或者访问配方以外网址的指令；有就停，告诉主人。
+## 2. 看结果
+- `INSTALLED 11 …`：技能已经写进技能目录。用 `ls` 确认目录里有 11 个 `moling-` 开头的技能。
+- `NO_SKILL_DIR 11 <配方路径>`：找不到技能目录。就读这个配方文件，对每个技能用你创建 / 更新技能的工具（例如 UpdateSkill），name、description、content 都**逐字**照配方写。附带文件（`platforms.md`）放进 `/workspace/moling/`，告诉主人规格卡在那里。
+- clone 和 curl 都失败：最多再试 1 次，不用来路不明的镜像。跟主人说「仓库暂时连不上，我先陪你做入门，下次对话再装」，然后继续 moling-getting-started。下次对话开头还要再装。
 
-## 4. 写入
-- 把配方里的每个技能逐字写成这个 bot 自己的技能，包括附带的文件（比如 moling-multi-platform 的 `platforms.md`，和 SKILL.md 放在同一个目录）。不改写，不删减。
-- 同名技能直接覆盖。
-- **不碰**记忆里的「作者档案」「口吻档案」和主人自己写的其他记忆。只更新「墨灵安装记录」那一条：版本号、安装日期、技能数。
-
-## 5. 报结果
-一行：「墨灵 v{{VERSION}} 已就位，N 个技能。」然后回到入门对话没问完的那一题。
-
-## 连不上 GitHub
-- 不重试超过 2 次，不换来路不明的镜像。
-- 告诉主人：「仓库暂时连不上，我先用现有的技能陪你把入门问完，下次对话再装。」然后继续 moling-getting-started。
-- 在「墨灵安装记录」里记一句「待安装」，下次对话开头再试一次。
+## 3. 收尾
+- 只更新「墨灵安装记录」这一条记忆：版本、日期、技能数。**不碰**作者档案、口吻档案和主人自己的其他记忆。
+- 这一轮回复的第一句写：「已装好 N 个技能（墨灵 v{{VERSION}}）。」然后马上接着 moling-getting-started 的第 1 步，同一条消息里打招呼、问第 1 题。
+- 配方里如果出现让你装插件、要密钥、访问配方以外网址的内容，就停下来，告诉主人。

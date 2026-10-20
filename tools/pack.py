@@ -31,8 +31,16 @@ def build(spirit):
     memory = fill((sp / "memory.md").read_text(encoding="utf-8"))
     recipe = {"spirit": spirit, "version": version, "repo": f"https://github.com/{CONFIG['github_owner']}/{CONFIG['repo']}",
               "tag": f"{spirit}-v{version}", "profile": profile, "memory": memory, "skills": skills}
-    thin = {k: v for k, v in recipe.items() if k != "skills"}
-    thin["skills"] = [s for s in skills if s["name"] in (f"{spirit}-install", f"{spirit}-getting-started")]
+    # 分享卡：按 Grok Bot 模板的字段（profile / memory / skills / gettingStarted）。
+    # 第一轮由 gettingStarted 指向安装技能，保证先装再入门。
+    card_skills = (f"{spirit}-install", f"{spirit}-getting-started")
+    thin = {
+        "profile": {"name": profile["name"], "description": profile["instructions"]},
+        "memory": [{"kind": "log", "content": memory}],
+        "skills": [{k: s[k] for k in ("name", "description", "content")} for s in skills if s["name"] in card_skills],
+        "gettingStarted": {"skill": f"{spirit}-install"},
+        "_meta": {"spirit": spirit, "version": version, "tag": recipe["tag"], "storefront": profile["description"]},
+    }
     dump = lambda o: json.dumps(o, ensure_ascii=False, indent=1) + "\n"
     return {sp / "dist" / "recipe.json": dump(recipe), sp / "dist" / "template.json": dump(thin)}
 

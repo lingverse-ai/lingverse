@@ -50,7 +50,7 @@ def check_spirit(sp, errors, warns):
         b = prof.stat().st_size
         total += b
         pj = json.loads(prof.read_text(encoding="utf-8"))
-        for k in ("name", "description", "intro"):
+        for k in ("name", "description", "intro", "instructions"):
             if not pj.get(k):
                 errors.append(f"[profile] {name}: 缺少 {k}")
         if len(pj.get("description", "")) > LIM["description_chars"]:

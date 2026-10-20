@@ -2,6 +2,14 @@
 
 格式参考 Keep a Changelog；每位灵单独打标签（`<spirit>-vX.Y.Z`）。
 
+## moling-v0.1.1 — 2026-10-20
+
+修复：从分享卡导入后没有装上完整技能包。
+- 分享卡的 gettingStarted 改成 `moling-install`：第一轮先装，再入门。
+- 资料卡加了 bot 指令，记忆和入门对话开头都写明「moling- 技能不满 11 个就先装」。
+- moling-install 改成可以直接运行的脚本：用 git 克隆固定标签，失败就用 curl 拉 raw 的 recipe.json，不需要 gh、不需要登录、不先问主人；写入后报告「已装好 N 个技能」。找不到技能目录时改用技能工具逐个写入。
+- template.json 改成 Grok Bot 模板的字段格式（profile / memory / skills / gettingStarted）。
+
 ## moling-v0.1.0 — 2026-10-20
 
 首个版本。
