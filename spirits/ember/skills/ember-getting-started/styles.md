@@ -32,7 +32,7 @@
 - 服装：灯芯绒外套、条纹 T 恤、高腰牛仔裤、帆布鞋、复古墨镜，no logo。
 - 场景：老式公交、街角报亭（无字）、黄昏海边、旧唱片店（无字封面）、老公寓阳台、铁轨、夜市、旧游乐园、电话亭、洗衣店、路边小摊、汽车旅馆。
 - Suno Style：`lofi soul hip hop, dusty drums, warm rhodes, vinyl crackle, nostalgic, 88 bpm, soft vocal, short catchy hook`
-- 节奏与字效：慢一点（每 1～2 小节），偶尔漏光闪白；字用粗衬线或圆体、奶油色、轻微抖动；逐字歌词像打字机；不用故障。
+- 节奏与字效：慢一点（每 1～2 小节），偶尔漏光闪白；中文字用思源黑体 Heavy（默认）、奶油色、轻微抖动；逐字歌词像打字机；不用故障。
 - LUT：`retro-film`；颗粒 8～10。
 
 ## 动漫
@@ -48,5 +48,5 @@
 - 服装：主角做成体素风（或用体素 IP，如萤火虫）；道具方块化，no logo。
 - 场景：方块森林、樱花岛、发光洞穴、浮空岛、像素城市霓虹、湖面倒影、雪山、灯塔、瀑布、传送门、萤火夜空、像素集市。
 - Suno Style：`chiptune electro pop, 8-bit arpeggios, punchy kick, playful, 128 bpm, bright vocal, chant hook`
-- 节奏与字效：每小节一刀，副歌半小节；**像素字体**（Fusion Pixel / Monocraft，OFL，加粗描边）；闪帧 + 方块故障；片尾像素字卡。
+- 节奏与字效：每小节一刀，副歌半小节；中文大字默认思源黑体 Heavy；可选在字效里勾「像素字体」（Fusion Pixel，OFL）；闪帧 + 方块故障；片尾字卡。
 - LUT：`voxel-pop`；颗粒 2。

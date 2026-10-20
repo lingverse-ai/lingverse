@@ -16,7 +16,7 @@ description: >-
 
 ## 1. 填 project.json（分镜阶段 plan.py 已出骨架）
 - `shots`：`src`、`in`/`out`（首尾相接铺满）、`src_start`（可用窗口起点）、`focus`（竖版取景）。每个素材只用一次。
-- 项目档案的选项 → 字段：LUT → `lut`；抠像开 → 大词加 `"behind": true`；HUD → `hud`；逐字歌词 → `lyrics`；跑马灯 → `ticker`；闪帧/故障 → `flash_on`/`glitch_on`；颗粒 → `grain`；片尾 → `endcard`。字体默认自动选（拉丁 Anton、中文思源黑体 Heavy，fonts.py 自动下载；像素风 `font: "pixel"`）。
+- 项目档案的选项 → 字段：LUT → `lut`；抠像开 → 大词加 `"behind": true`；HUD → `hud`；逐字歌词 → `lyrics`；跑马灯 → `ticker`；闪帧/故障 → `flash_on`/`glitch_on`；颗粒 → `grain`；片尾 → `endcard`。字体默认自动选（拉丁 Anton、中文思源黑体 Heavy，fonts.py 自动下载；主人自己的字体 `cn_font`，见参考文件「自己加字体」；像素风 `font: "pixel"`）。
 - 有 `words.json`：`lyrics` 用它的 `lines`；`punch_on` 填 beatmap 的 `accent_hits`/`big_drops`（镜头跟鼓点顶一下，`punch` 默认 0.06）。
 - 写完跑 `python3 $T/audit.py project.json`：切点在拍上、歌词关 N/N、开头钩子、≥3 层、闪烁不过密。不 PASS 不渲染。
 

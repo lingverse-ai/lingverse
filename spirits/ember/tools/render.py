@@ -170,7 +170,11 @@ def render(pj, out, preview=False, rough=False, excerpt=None):
     assert abs(shots[0]["in"]) < 1e-6 and abs(shots[-1]["out"] - dur) < 0.05, "shots 必须从 0 铺满到 duration"
     for a, b in zip(shots, shots[1:]):
         assert abs(a["out"] - b["in"]) < 1e-3, f"镜头之间有缝/重叠：{a['out']} vs {b['in']}"
-    CN_FONT[0] = p.get("cn_font")
+    cf = p.get("cn_font")  # 内置名（cn-…）或主人自己的字体文件（相对项目目录）
+    if cf and cf not in __import__("fonts").SPEC and cf != "cn-heavy":
+        cf = str((base / cf).resolve()) if not os.path.isabs(cf) else cf
+        assert os.path.exists(cf), f"找不到字体文件 {cf}（放到项目的 fonts/ 里）"
+    CN_FONT[0] = cf
     font = p.get("font")  # None = 按文字自动选（Anton / 思源黑体 Heavy）
     tmp = Path(tempfile.mkdtemp(prefix="ember-"))
     try:

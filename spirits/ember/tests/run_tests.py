@@ -1,5 +1,5 @@
 """流萤工具测试：python3 spirits/ember/tests/run_tests.py （需要 ffmpeg + numpy）"""
-import json, subprocess, sys, tempfile
+import shutil, json, subprocess, sys, tempfile
 from pathlib import Path
 
 SP = Path(__file__).resolve().parent.parent; T = SP / "tools"; M = SP / "music"
@@ -107,7 +107,15 @@ for k in ("段落标记用英文", "AI 套话", "有括号", "阿拉伯数字", 
     if k not in r.stdout: fails.append(f"lyrics_cn 没查出「{k}」")
 py(T / "fonts.py", "sheet", fr, tmp / "fonts.jpg", "未来就在眼前")
 if not (tmp / "fonts.jpg").exists(): fails.append("中文字体对比图没出来")
-print("lyrics_cn / cn fonts ok" if not fails else "")
+cp = tmp / "cf"; (cp / "fonts").mkdir(parents=True, exist_ok=True)
+sys.path.insert(0, str(T)); from fonts import find_font as _ff
+shutil.copy(_ff("cn-kuaile"), cp / "fonts" / "My.ttf")
+cj = json.loads(ex.read_text()); cj["cn_font"] = "fonts/My.ttf"; cj["audio"] = str(M / "ember-neon-140.mp3"); cj["words"] = [{"t": 1, "until": 2, "text": "未来"}]
+for s_ in cj["shots"]:
+    if s_.get("src") and not str(s_["src"]).startswith("/") and s_["src"] != "INTRO_CARD" and ":" not in str(s_["src"]): s_["src"] = str((ex.parent / s_["src"]).resolve())
+(cp / "p.json").write_text(json.dumps(cj, ensure_ascii=False)); py(T / "render.py", cp / "p.json", cp / "o.mp4", "--preview")
+if not (cp / "o.mp4").exists(): fails.append("自己加字体 cn_font 渲染失败")
+print("lyrics_cn / cn fonts / 自带字体 ok" if not fails else "")
 
 print("FAILED:\n- " + "\n- ".join(fails) if fails else "ALL PASS")
 sys.exit(1 if fails else 0)

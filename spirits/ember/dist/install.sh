@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 # 流萤安装脚本（pack.py 填入版本后生成 dist/install.sh）。不需要 gh，不需要登录。
 # 用法：curl -fsSL https://raw.githubusercontent.com/lingverse-ai/lingverse/ember-v0.1.0/spirits/ember/dist/install.sh | bash
+# 标签还没发布（预发布期）：curl -fsSL https://raw.githubusercontent.com/lingverse-ai/lingverse/main/spirits/ember/dist/install.sh | EMBER_REF=main bash
+#   不写 EMBER_REF 时先装标签，标签不存在会自动改装 main，并打印 REF_FALLBACK main。
 # 做三件事：10 个技能写进技能目录；渲染工具、自带音乐和 LUT 放到 $EMBER_HOME（默认 /workspace/ember）；检查 ffmpeg / numpy / rembg、faster-whisper（可选）。
 export GIT_TERMINAL_PROMPT=0
 T=ember-v0.1.0; R=https://github.com/lingverse-ai/lingverse
+[ -n "$EMBER_REF" ] && T=$EMBER_REF
+if [ -z "$EMBER_REF" ] && ! git ls-remote --exit-code --tags "$R" "$T" >/dev/null 2>&1 \
+   && ! curl -fsI "https://raw.githubusercontent.com/lingverse-ai/lingverse/$T/spirits/ember/dist/recipe.json" >/dev/null 2>&1; then
+  echo "REF_FALLBACK main（标签 $T 还没发布）"; T=main
+fi
+echo "REF $T"
 RAWB=https://raw.githubusercontent.com/lingverse-ai/lingverse/$T/spirits/ember
 W=/tmp/lingverse-$T; RJ=/tmp/recipe-$T.json; H=${EMBER_HOME:-/workspace/ember}; rm -rf "$W"
 mkdir -p "$H/tools" "$H/music" "$H/luts" "$H/projects"

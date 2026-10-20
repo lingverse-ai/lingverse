@@ -160,3 +160,11 @@ claude -p "Read REVISION.md and implement it fully. Clips are in clips/, stills 
 6. 调色：「调节」→「LUT」导入 .cube（自带 6 个）。
 7. 抠像：选中人像镜头 →「智能抠像」，复制一层放到文字上面，就能字压在人身后。
 8. 导出 1080p 30fps；竖版新建 9:16 草稿重新摆位。
+
+## 自己加字体（cn_font）
+默认的中文字体是思源黑体 Heavy，自动下载，不用设置。主人想用自己的字体时：
+1. 主人发来 .ttf 或 .otf 文件，并确认这款字体可以商用（看字体自带的授权说明；说不清就不用）。
+2. 存到项目里：`mkdir -p $P/fonts && cp <文件> $P/fonts/`。
+3. project.json 写 `"cn_font": "fonts/MyFont.ttf"`（相对项目目录或绝对路径都行），所有中文字卡都会换成这款；只想换某一个字卡，就在那个字卡写 `"font": "fonts/MyFont.ttf"`。
+4. 先出 `--preview` 看一眼有没有缺字（缺字会显示成方框）。缺字就换回默认字体，或者改词。
+可选的内置字体（同样是 OFL，用到时才下载）：`cn-smiley` 得意黑、`cn-kuaile` 站酷快乐体、`cn-huangyou` 站酷庆科黄油体、`cn-serif` 思源宋体 Heavy、`cn-brush` 马善政毛笔楷书。直接写进 `cn_font` 即可。

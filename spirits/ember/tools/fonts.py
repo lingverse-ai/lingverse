@@ -3,10 +3,10 @@
   cjk      思源黑体 Heavy          —— 中文大字
   mono     JetBrains Mono ExtraBold —— HUD、终端逐字歌词
   pixel    Fusion Pixel 12px（简中）—— 方块世界预设
-中文大字 A/B（入门第 12 题；全部 OFL 1.1，可商用、可脚本下载）：
+中文默认 = 思源黑体 Heavy（cjk）。以下可选字体只在 cn_font 指定时才下载（全部 OFL 1.1）：
   cn-heavy 思源黑体 Heavy（= cjk，默认） cn-smiley 得意黑 Smiley Sans   cn-kuaile 站酷快乐体
   cn-huangyou 站酷庆科黄油体          cn-serif 思源宋体 Heavy         cn-brush 马善政毛笔楷书
-  project.json 里 "cn_font": "cn-smiley" 即可让所有中文字卡换字体。
+  project.json 写 "cn_font": "cn-smiley" 或主人自己字体的路径 "fonts/xx.ttf"（相对项目目录），所有中文字卡都会换。
 用法：python3 fonts.py [display|cjk|mono|pixel|cn-…|all]   → 打印路径
       python3 fonts.py sheet 背景帧.png 出图.jpg "未来就在眼前"   → 6 款中文字体 A/B 对比图（给主人选）
       from fonts import font_for; font_for("FUTURE") / font_for("未来")  → 按文字自动选 display 或 cjk"""
@@ -74,7 +74,8 @@ def find_font(kind="cjk"):
 
 def font_for(text, cn="cjk"):
     """有中日韩字就用中文大字（默认思源黑体 Heavy，可换 cn-*），否则用 Anton。"""
-    return find_font((cn or "cjk") if any(ord(c) > 0x2E80 for c in text) else "display")
+    if not any(ord(c) > 0x2E80 for c in text): return find_font("display")
+    return cn if cn and os.path.exists(cn) else find_font(cn or "cjk")
 
 
 CN = [("cn-heavy", "思源黑体 Heavy"), ("cn-smiley", "得意黑"), ("cn-kuaile", "站酷快乐体"),
@@ -102,5 +103,6 @@ def sheet(bg, out, text="未来就在眼前"):
 if __name__ == "__main__":
     if sys.argv[1:2] == ["sheet"]:
         print(sheet(sys.argv[2], sys.argv[3], *(sys.argv[4:5]))); sys.exit()
-    kinds = list(SPEC) if (sys.argv[1:] or ["all"])[0] == "all" else sys.argv[1:]
+    core = ["display", "cjk", "mono", "pixel"]  # 默认只装这 4 款
+    kinds = core if (sys.argv[1:] or ["all"])[0] == "all" else list(SPEC) if sys.argv[1] == "extras" else sys.argv[1:]
     for k in kinds: print(k, find_font(k))

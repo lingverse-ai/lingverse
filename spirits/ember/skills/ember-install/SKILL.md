@@ -15,6 +15,12 @@ description: >-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/{{OWNER}}/lingverse/ember-v{{VERSION}}/spirits/ember/dist/install.sh | bash
 ```
+标签还没发布时（预发布期），用 main：
+```bash
+curl -fsSL https://raw.githubusercontent.com/{{OWNER}}/lingverse/main/spirits/ember/dist/install.sh | EMBER_REF=main bash
+```
+不写 EMBER_REF 也行：标签不存在时脚本会自动改装 main，并打印 `REF_FALLBACK main`。第一条命令返回 404 就直接用这条。
+
 脚本会先 `git clone` 这个标签，失败就用 curl 拉配方和工具；把 10 个技能写进技能目录，把渲染工具（render.py、beatmap.py、qc.py 等）和 3 首 CC0 自带音乐放到 `/workspace/ember/`，再检查 ffmpeg 和 numpy。
 
 ## 2. 看结果
