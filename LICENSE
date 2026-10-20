@@ -1,15 +1,36 @@
-许可证：待主人确认（PENDING OWNER APPROVAL）
-=========================================
+灵境 Lingverse 许可证（双许可）
+Copyright (c) 2026 小爷
 
-本文件是占位文件。正式许可证由仓库主人确认后替换。在确认之前，本仓库不授予任何许可。
+本仓库按目录分两种许可：
 
-拟定方案 / Proposed:
+一、内容：CC BY 4.0
+范围：spirits/*/skills/、spirits/*/examples/、spirits/*/profile.json、spirits/*/memory.md、
+spirits/*/DESIGN.md、shared/，以及仓库里所有 Markdown 文档。
+许可：Creative Commons Attribution 4.0 International（CC BY 4.0）
+全文：https://creativecommons.org/licenses/by/4.0/legalcode
+署名要求：注明「灵境 Lingverse · 小爷」并附本仓库链接。
 
-1. 内容（spirits/*/skills、spirits/*/examples、shared/、所有 .md 文档）
-   Creative Commons Attribution 4.0 International (CC BY 4.0)
-   https://creativecommons.org/licenses/by/4.0/
+二、工具代码：MIT
+范围：tools/、spirits/*/tests/、.github/
 
-2. 工具代码（tools/、spirits/*/tests/*.py、.github/）
-   MIT License
+MIT License
 
-Copyright (c) 2026 [OWNER_PENDING]
+Copyright (c) 2026 小爷
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

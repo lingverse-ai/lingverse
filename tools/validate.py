@@ -134,7 +134,8 @@ def main(root):
         if rel.as_posix() == "tools/scrub_hashes.json":
             continue
         text = p.read_text(encoding="utf-8", errors="ignore")
-        if hash_hits(text, hashes["private"]):
+        allow = set(CONFIG.get("private_allow", {}).get(rel.as_posix(), []))
+        if hash_hits(text, [e for e in hashes["private"] if e["sha256"] not in allow]):
             errors.append(f"[private] {rel}: 命中私人词名单")
         if hash_hits(text, hashes["creators"]):
             errors.append(f"[trace] {rel}: 命中其他创作者名单")
@@ -144,7 +145,7 @@ def main(root):
     for sp in sorted((root / "spirits").iterdir()):
         if sp.is_dir():
             totals[sp.name] = check_spirit(sp, errors, warns)
-    if CONFIG["github_owner"] == "OWNER_PENDING":
+    if CONFIG["github_owner"] in ("", "OWNER_PENDING"):
         warns.append("[owner] tools/config.json 的 github_owner 还没定")
     for w in warns:
         print("WARN ", w)

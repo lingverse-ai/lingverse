@@ -50,6 +50,7 @@ private_term = chr(0x5C0F) + chr(0x7237)
 creator_term = "".join(map(chr, (0x5361, 0x5179, 0x514B)))
 mutate("budget", append(SK / "moling-first-draft/SKILL.md", "啊" * 3000))
 mutate("private", append(SK / "moling-first-draft/SKILL.md", "\n" + private_term + "\n"))
+mutate("private", append("CONTRIBUTING.md", "\n" + private_term + "\n"))  # 放行只限 LICENSE/README
 mutate("trace", append("spirits/moling/examples/02-样稿-老周.md", "\n" + creator_term + "\n"))
 mutate("refs", append(SK / "moling-first-draft/SKILL.md", "\n见 `re" + "fs/platforms.md`\n"))
 mutate("xref", append(SK / "moling-first-draft/SKILL.md", "\n交给 moling-nonexistent。\n"))

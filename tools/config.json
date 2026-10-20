@@ -1,5 +1,19 @@
 {
-  "github_owner": "OWNER_PENDING",
+  "github_owner": "lingverse-ai",
   "repo": "lingverse",
-  "limits": {"skill_bytes": 6144, "total_bytes": 81920, "profile_bytes": 3072, "description_chars": 400}
+  "limits": {
+    "skill_bytes": 6144,
+    "total_bytes": 81920,
+    "profile_bytes": 3072,
+    "description_chars": 400
+  },
+  "private_allow": {
+    "_note": "版权署名是公开信息，只在这两个文件里放行这一个哈希；技能、示例照常扫描。",
+    "LICENSE": [
+      "560cd6a6e4936fdb004127f3892813b48df2dc22163efa2819f3dd5ae14da9e7"
+    ],
+    "README.md": [
+      "560cd6a6e4936fdb004127f3892813b48df2dc22163efa2819f3dd5ae14da9e7"
+    ]
+  }
 }

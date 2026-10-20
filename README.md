@@ -17,7 +17,7 @@ Moling writes long-form posts for project operators and self-media founders who 
 
 ### 安装 / Install
 
-一行：从资料卡导入墨灵模板（链接发布后补上），然后对它说：
+一行：从资料卡导入墨灵模板（链接发布后补上；仓库：github.com/lingverse-ai/lingverse），然后对它说：
 
 ```
 安装墨灵
@@ -59,4 +59,8 @@ python3 spirits/moling/tests/run_tests.py # 夹具 + 反向用例
 
 ## 许可 / License
 
-**待主人确认。** 拟定：内容（技能、文档、示例）用 CC BY 4.0，工具代码用 MIT。见 [LICENSE](LICENSE)。
+版权所有 © 2026 小爷。双许可，详见 [LICENSE](LICENSE)：
+- **内容**（技能、示例、资料卡、记忆、shared/ 和所有文档）：[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)，转载或改编请署名「灵境 Lingverse · 小爷」并附仓库链接。
+- **工具代码**（tools/、tests/、.github/）：MIT。
+
+Copyright © 2026 小爷. Content and skills: CC BY 4.0. Tooling (tools/, tests/, .github/): MIT.
