@@ -2,6 +2,14 @@
 
 格式参考 Keep a Changelog；每位灵单独打标签（`<spirit>-vX.Y.Z`）。
 
+## moling-v0.1.2 — 2026-10-20
+
+修复：导入后只带进一条记忆，技能正文没到，bot 找不到仓库。
+- 资料卡指令（persona）和那条记忆里都直接写上完整仓库地址、标签、raw 配方地址和完整安装步骤，就算一个技能都没带进来也能装。
+- 新增 `spirits/moling/dist/install.sh`：一行 `curl … | bash` 就能装（git clone 失败自动改用 curl 拉配方）。
+- 入门对话开头自带安装命令，单独也能完成安装。
+- README 补了「moling lingverse」检索词和手动安装命令；仓库加了 description 和 topics。
+
 ## moling-v0.1.1 — 2026-10-20
 
 修复：从分享卡导入后没有装上完整技能包。

@@ -4,8 +4,10 @@
 
 <p align="center"><b>一组能直接装进 Grok Bot 的「灵」，每位只把一件事做到最好。</b></p>
 
+<p align="center">墨灵 Moling · moling lingverse · Grok Bot 长文写手 · 仓库 <a href="https://github.com/lingverse-ai/lingverse">github.com/lingverse-ai/lingverse</a></p>
+
 <p align="center">
-  <a href="CHANGELOG.md"><img alt="version" src="https://img.shields.io/badge/墨灵-v0.1.0-111111"></a>
+  <a href="CHANGELOG.md"><img alt="version" src="https://img.shields.io/badge/墨灵-v0.1.2-111111"></a>
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-CC%20BY%204.0%20%2B%20MIT-555555"></a>
   <a href="https://github.com/lingverse-ai/lingverse/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/lingverse-ai/lingverse/actions/workflows/ci.yml/badge.svg"></a>
 </p>
@@ -57,6 +59,12 @@
 2. 第一次对话时，墨灵会说明它要从本仓库装完整技能，大约一分钟，不装插件，也不要任何密钥。
 3. 装好后直接开始入门对话。
 
+手动安装（任何能跑 shell 的 bot，不需要 gh）：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lingverse-ai/lingverse/moling-v0.1.2/spirits/moling/dist/install.sh | bash
+```
+
 **更新：** 对墨灵说一句「更新」。墨灵每周最多自动检查一次，有新版先用几行话告诉你改了什么，你同意才装。你的作者档案和口吻档案存在你自己的记忆里，更新不会覆盖。版本只发布打过标签、测试过的版本。
 
 **入门前准备好这几样，十分钟就能开写**
@@ -75,7 +83,7 @@
 
 | 灵 | 职能 | 状态 |
 |---|---|---|
-| 墨灵 Moling | 长文 | ✅ v0.1.0 |
+| 墨灵 Moling | 长文 | ✅ v0.1.2 |
 | 流萤 Ember | MV | 筹备中 |
 | 朱砂 Cinnabar | 海报 | 筹备中 |
 | 听潮 Tide | 声音 | 筹备中 |
@@ -132,5 +140,5 @@ assets/            图片素材
 - **Install:** import Moling from its share link (coming soon). On first chat it installs its full skill set from a pinned tag of this repo. No plugins, no keys.
 - **Update:** say 「更新」 ("update"). Moling checks at most weekly, summarises what changed, and installs only after you say yes. Your profiles are never overwritten.
 - **Skills:** onboarding, voice profile, topic and title, structure and opening, first draft, de-AI edit, multi-platform rewrite, covers and images, and a pre-publish check, plus install and update.
-- **Roadmap:** 墨灵 Moling, long-form (✅ v0.1.0); 流萤 Ember, MV; 朱砂 Cinnabar, posters; 听潮 Tide, voice; 算盘子 Abacus, closing deals (XY Skill); 问樵 Sage, strategy; 守夜 Nightwatch, radar and review.
+- **Roadmap:** 墨灵 Moling, long-form (✅ v0.1.2); 流萤 Ember, MV; 朱砂 Cinnabar, posters; 听潮 Tide, voice; 算盘子 Abacus, closing deals (XY Skill); 问樵 Sage, strategy; 守夜 Nightwatch, radar and review.
 - **License:** © 2026 小爷. Content and skills under CC BY 4.0; tooling (`tools/`, `tests/`, `.github/`) under MIT.

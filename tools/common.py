@@ -4,7 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG = json.loads((ROOT / "tools" / "config.json").read_text(encoding="utf-8"))
-TEXT_SUFFIXES = {".md", ".json", ".yml", ".yaml", ".py", ".txt", ""}
+TEXT_SUFFIXES = {".md", ".json", ".yml", ".yaml", ".py", ".txt", ".sh", ""}
 
 # 平台关键词 → 规格卡里的章节标题关键词
 PLATFORMS = {"X": "X Article", "公众号": "公众号", "抖音": "抖音", "小红书": "小红书", "知乎": "知乎", "微博": "微博"}

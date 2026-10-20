@@ -27,7 +27,7 @@ def build(spirit):
         meta = parse_frontmatter(text)
         files = {f.name: fill(f.read_text(encoding="utf-8")) for f in sorted(d.iterdir()) if f.name != "SKILL.md"}
         skills.append({"name": meta["name"], "description": meta["description"], "content": text, "files": files})
-    profile = json.loads((sp / "profile.json").read_text(encoding="utf-8"))
+    profile = json.loads(fill((sp / "profile.json").read_text(encoding="utf-8")))
     memory = fill((sp / "memory.md").read_text(encoding="utf-8"))
     recipe = {"spirit": spirit, "version": version, "repo": f"https://github.com/{CONFIG['github_owner']}/{CONFIG['repo']}",
               "tag": f"{spirit}-v{version}", "profile": profile, "memory": memory, "skills": skills}
@@ -42,7 +42,10 @@ def build(spirit):
         "_meta": {"spirit": spirit, "version": version, "tag": recipe["tag"], "storefront": profile["description"]},
     }
     dump = lambda o: json.dumps(o, ensure_ascii=False, indent=1) + "\n"
-    return {sp / "dist" / "recipe.json": dump(recipe), sp / "dist" / "template.json": dump(thin)}
+    out = {sp / "dist" / "recipe.json": dump(recipe), sp / "dist" / "template.json": dump(thin)}
+    if (sp / "install.sh").exists():
+        out[sp / "dist" / "install.sh"] = fill((sp / "install.sh").read_text(encoding="utf-8"))
+    return out
 
 
 def main():
