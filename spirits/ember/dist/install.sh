@@ -12,7 +12,7 @@ if git clone -q --depth 1 --branch "$T" "$R" "$W" 2>/dev/null; then
   cp "$W"/spirits/ember/tools/*.py "$H/tools/"; cp "$W"/spirits/ember/music/* "$H/music/"; cp "$W"/spirits/ember/luts/* "$H/luts/"
 else
   curl -fsSL "$RAWB/dist/recipe.json" -o "$RJ" || { echo "FETCH_FAILED $R"; exit 1; }
-  for f in audit.py beatmap.py fonts.py grade.py lyrics_align.py make_luts.py make_starter_music.py matte.py plan.py qc.py render.py songcut.py state.py upscale.py; do curl -fsSL "$RAWB/tools/$f" -o "$H/tools/$f" || echo "TOOL_FETCH_FAILED $f"; done
+  for f in audit.py beatmap.py fonts.py grade.py lyrics_align.py lyrics_cn.py make_luts.py make_starter_music.py matte.py plan.py qc.py render.py songcut.py state.py upscale.py; do curl -fsSL "$RAWB/tools/$f" -o "$H/tools/$f" || echo "TOOL_FETCH_FAILED $f"; done
   for f in anime-bright.cube cyber-neon.cube guofeng-ink.cube retro-film.cube v11-street.cube voxel-pop.cube; do curl -fsSL "$RAWB/luts/$f" -o "$H/luts/$f" || echo "LUT_FETCH_FAILED $f"; done
   for f in LICENSES.md ember-lofi-90.mp3 ember-neon-140.mp3 ember-sunrise-120.mp3; do curl -fsSL "$RAWB/music/$f" -o "$H/music/$f" || echo "MUSIC_FETCH_FAILED $f"; done
 fi
@@ -37,4 +37,5 @@ command -v ffmpeg >/dev/null || echo "DEPS_MISSING ffmpeg（sudo apt-get install
 python3 -c "import numpy" 2>/dev/null || pip install -q numpy 2>/dev/null || pip install -q --user numpy 2>/dev/null || python3 -m pip install -q --break-system-packages numpy 2>/dev/null || echo "DEPS_MISSING numpy（pip install numpy）"
 python3 -c "import rembg" 2>/dev/null || pip install -q "rembg[cpu]" 2>/dev/null || python3 -m pip install -q --break-system-packages "rembg[cpu]" 2>/dev/null || echo "OPTIONAL_MISSING rembg（抠像不可用，其余功能正常）"
 python3 -c "import faster_whisper" 2>/dev/null || pip install -q faster-whisper 2>/dev/null || python3 -m pip install -q --break-system-packages faster-whisper 2>/dev/null || echo "OPTIONAL_MISSING faster-whisper（歌词自动对时间不可用，可用 --even 粗分配）"
+python3 -c "import pypinyin" 2>/dev/null || pip install -q pypinyin 2>/dev/null || python3 -m pip install -q --break-system-packages pypinyin 2>/dev/null || echo "OPTIONAL_MISSING pypinyin（中文歌词体检少了押韵/多音字）"
 ls "$H/tools/render.py" >/dev/null 2>&1 && echo "TOOLS_OK $H/tools" || echo "TOOLS_MISSING $H/tools"

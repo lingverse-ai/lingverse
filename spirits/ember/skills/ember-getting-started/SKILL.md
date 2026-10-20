@@ -31,7 +31,9 @@ description: >-
 | 9 | 字压在人身后（抠像） | ★开 / 关 | 否 |
 | 10 | 附加效果 | ★闪帧 / ★drop 故障 / ★颗粒 / ★HUD / ★逐字歌词 / 跑马灯 | 是 |
 | 11 | 主角 | ★我本人（发 3～6 张照片）/ 我的 IP（发参考图）/ 帮我做一个原创 IP | 否 |
-默认值随预设变：选了国风就把 HUD 取消、字效换成中文大字；选方块世界就勾像素字体（按 `styles.md`）。
+| 12 | 中文大字体（先发 `fonts.py sheet` 出的 A–F 对比图） | ★A 思源黑体 Heavy / B 得意黑 / C 站酷快乐体 / D 站酷庆科黄油体 / E 思源宋体 Heavy / F 马善政毛笔 | 否 |
+字体对比图：`python3 /workspace/ember/tools/fonts.py sheet <主人照片或一帧> $P/out/fonts.jpg "<一句话>"`，选中写进 project.json 的 `cn_font`（cn-heavy/cn-smiley/cn-kuaile/cn-huangyou/cn-serif/cn-brush），全部 OFL 可商用。
+默认值随预设变：国风默认 E 或 F，动漫默认 C；选了国风就把 HUD 取消、字效换成中文大字；选方块世界就勾像素字体（按 `styles.md`）。
 
 照片：正脸、侧脸、全身各至少一张。只存在项目文件夹和主人的记忆里，不传到别处。只用本人或已授权的人的脸。
 

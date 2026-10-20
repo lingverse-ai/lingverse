@@ -37,4 +37,5 @@ command -v ffmpeg >/dev/null || echo "DEPS_MISSING ffmpeg（sudo apt-get install
 python3 -c "import numpy" 2>/dev/null || pip install -q numpy 2>/dev/null || pip install -q --user numpy 2>/dev/null || python3 -m pip install -q --break-system-packages numpy 2>/dev/null || echo "DEPS_MISSING numpy（pip install numpy）"
 python3 -c "import rembg" 2>/dev/null || pip install -q "rembg[cpu]" 2>/dev/null || python3 -m pip install -q --break-system-packages "rembg[cpu]" 2>/dev/null || echo "OPTIONAL_MISSING rembg（抠像不可用，其余功能正常）"
 python3 -c "import faster_whisper" 2>/dev/null || pip install -q faster-whisper 2>/dev/null || python3 -m pip install -q --break-system-packages faster-whisper 2>/dev/null || echo "OPTIONAL_MISSING faster-whisper（歌词自动对时间不可用，可用 --even 粗分配）"
+python3 -c "import pypinyin" 2>/dev/null || pip install -q pypinyin 2>/dev/null || python3 -m pip install -q --break-system-packages pypinyin 2>/dev/null || echo "OPTIONAL_MISSING pypinyin（中文歌词体检少了押韵/多音字）"
 ls "$H/tools/render.py" >/dev/null 2>&1 && echo "TOOLS_OK $H/tools" || echo "TOOLS_MISSING $H/tools"

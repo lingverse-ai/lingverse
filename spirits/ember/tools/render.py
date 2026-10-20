@@ -13,8 +13,12 @@ from fonts import find_font, font_for
 
 def pick_font(spec, text):
     """spec：None=按文字自动（英文 Anton / 中文思源黑体 Heavy）；display|cjk|mono|pixel；或字体文件路径。"""
-    if not spec: return font_for(text)
-    return find_font(spec) if spec in ("display", "cjk", "mono", "pixel") else spec
+    from fonts import SPEC
+    if not spec: return font_for(text, CN_FONT[0])
+    return find_font(spec) if spec in SPEC or spec == "cn-heavy" else spec
+
+
+CN_FONT = [None]  # project.json 的 cn_font（中文字体 A/B 选中的那款）
 
 IMG = {".png", ".jpg", ".jpeg", ".webp"}
 
@@ -166,6 +170,7 @@ def render(pj, out, preview=False, rough=False, excerpt=None):
     assert abs(shots[0]["in"]) < 1e-6 and abs(shots[-1]["out"] - dur) < 0.05, "shots 必须从 0 铺满到 duration"
     for a, b in zip(shots, shots[1:]):
         assert abs(a["out"] - b["in"]) < 1e-3, f"镜头之间有缝/重叠：{a['out']} vs {b['in']}"
+    CN_FONT[0] = p.get("cn_font")
     font = p.get("font")  # None = 按文字自动选（Anton / 思源黑体 Heavy）
     tmp = Path(tempfile.mkdtemp(prefix="ember-"))
     try:

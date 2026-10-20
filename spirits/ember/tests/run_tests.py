@@ -100,5 +100,14 @@ py(T / "qc.py", "share", tmp / "ex.mp4", tmp / "sh.mp4", "--max-mb", "2")
 if not (tmp / "sh.mp4").exists() or (tmp / "sh.mp4").stat().st_size > 2.2e6: fails.append("分享版超大小")
 print("state / audit / align / excerpt / share ok" if not fails else "")
 
+# 7. 中文：歌词体检 + 中文字体 A/B 对比图
+bl = tmp / "cn.txt"; bl.write_text("[副歌]\n追逐梦想在星辰大海\n我们一起(一起)走在3点的街头\n", encoding="utf-8")
+r = py(T / "lyrics_cn.py", bl, "--bpm", "90", "--style", "pop")
+for k in ("段落标记用英文", "AI 套话", "有括号", "阿拉伯数字", "mandarin"):
+    if k not in r.stdout: fails.append(f"lyrics_cn 没查出「{k}」")
+py(T / "fonts.py", "sheet", fr, tmp / "fonts.jpg", "未来就在眼前")
+if not (tmp / "fonts.jpg").exists(): fails.append("中文字体对比图没出来")
+print("lyrics_cn / cn fonts ok" if not fails else "")
+
 print("FAILED:\n- " + "\n- ".join(fails) if fails else "ALL PASS")
 sys.exit(1 if fails else 0)

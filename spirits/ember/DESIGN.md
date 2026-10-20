@@ -28,6 +28,8 @@
 | upscale.py | 4K 放大：Real-ESRGAN 有就用，否则 lanczos + 锐化 |
 | make_luts.py | 生成 6 个 CC0 LUT（`luts/`） |
 | fonts.py | 默认字体全部 OFL、自动下载到 $EMBER_HOME/fonts：拉丁大字 Anton（v11 同款超粗窄体）、中文 思源黑体 Heavy、等宽 JetBrains Mono ExtraBold、像素 Fusion Pixel |
+| fonts.py（中文 A/B） | cn-heavy 思源黑体 Heavy、cn-smiley 得意黑、cn-kuaile 站酷快乐体、cn-huangyou 站酷庆科黄油体、cn-serif 思源宋体 Heavy、cn-brush 马善政毛笔楷书，全部 SIL OFL 1.1；`fonts.py sheet` 出对比图。没收录：站酷酷黑、站酷高端黑（官方声明免费商用，但转授权和部分企业用途另算，而且只能从站酷网页下载）、阿里巴巴普惠体（不能转授权，官方没有脚本可用的下载地址）、HarmonyOS Sans（不能单独再分发，官方仓库没有 Black 字重）、庞门正道标题体和优设标题黑（只有公众号或网页声明，不能脚本下载） |
+| lyrics_cn.py | 中文歌词体检：字数对槽位（按 v11 实测校准）、十三辙押韵、连续第三声、多音字、Suno 格式（括号、数字、段落标记、语言标签）、AI 套话 |
 | state.py | 项目进度表 8 步 + 下一步命令；DECISIONS.md 原话记录；gates.json 关口；后台任务 RUNS.md（换对话可续） |
 | lyrics_align.py | 歌词对时间：faster-whisper 出词时间，对齐到主人写的歌词（可选，`--even` 兜底） |
 | audit.py | 剪辑工程自检：切点在拍上、歌词关 N/N、开头钩子、≥3 层、闪烁、片尾卡 |
