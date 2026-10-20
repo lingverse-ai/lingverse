@@ -59,5 +59,24 @@ for flag, size in (("--preview", (960, 540)), ("--rough", (1920, 1080))):
 r = py(T / "qc.py", tmp / "r--preview.mp4", "--expect", "960x540", "--dur", "10")
 print("qc:", r.stdout.strip().splitlines()[-1] if r.stdout else "")
 
+# 5. 进阶工具：LUT 调色、对比图、放大兜底、HUD/逐字歌词/跑马灯/LUT 渲染；有 rembg 时测抠像 + 字在人身后
+fr = tmp / "f.png"
+subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", "testsrc2=s=640x360:d=1", "-frames:v", "1", str(fr)], check=True)
+for lut in ("v11-street", "cyber-neon", "guofeng-ink", "retro-film", "anime-bright", "voxel-pop"):
+    if not (SP / "luts" / f"{lut}.cube").exists(): fails.append(f"缺 LUT {lut}")
+py(T / "grade.py", fr, tmp / "g.png", "--lut", "retro-film"); py(T / "grade.py", fr, tmp / "cmp.png", "--compare")
+small = tmp / "r--preview.mp4"; py(T / "upscale.py", small, tmp / "up.mp4", "--size", "1920x1080", "--force-ffmpeg")
+if (tmp / "up.mp4").exists() and probe(tmp / "up.mp4")[:2] != (1920, 1080): fails.append("upscale 尺寸不对")
+fx = json.loads(ex.read_text()); fx.update(audio=str(M / "ember-neon-140.mp3"), lut="v11-street", hud={"title": "TEST"},
+    lyrics=[{"t": 2, "until": 3.4, "text": "ONE LINE"}], ticker=[{"from": 3.4, "to": 6.8, "text": "TICKER — "}])
+try:
+    import rembg  # noqa
+    fx["shots"][2]["src"] = str(fr); fx["words"].append({"t": 3.5, "until": 5, "text": "BEHIND", "behind": True})
+except ImportError:
+    print("（没装 rembg，跳过抠像测试）")
+fxj = tmp / "fx.json"; fxj.write_text(json.dumps(fx)); py(T / "render.py", fxj, tmp / "fx.mp4", "--preview")
+if (tmp / "fx.mp4").exists(): print("fx render:", probe(tmp / "fx.mp4"))
+print("grade / upscale / fx ok" if not fails else "")
+
 print("FAILED:\n- " + "\n- ".join(fails) if fails else "ALL PASS")
 sys.exit(1 if fails else 0)

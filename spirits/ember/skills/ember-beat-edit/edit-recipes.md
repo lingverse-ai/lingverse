@@ -33,6 +33,31 @@
 | `--rough` | 粗剪：忽略 words/flash/glitch/grain/endcard |
 | `--preview` | 半分辨率，几秒出片，改字效时用 |
 
+进阶字段（都在流萤机器上跑，不用 Claude Code）：
+```json
+ "lut": "v11-street",
+ "words": [{"t": 6.857, "until": 8.571, "text": "FUTURE", "size": 420, "behind": true}],
+ "lyrics": [{"t": 7.0, "until": 8.4, "text": "ONE LINE BECOMES A SONG", "y": 0.70}], "lyric_cps": 20,
+ "hud": {"title": "EMBER // LINGVERSE", "label": "TRACK 01"},
+ "ticker": [{"from": 15.4, "to": 18.8, "text": "MAKE ME A MUSIC VIDEO — ", "y": 0.5, "size": 140, "speed": 600}],
+ "matte_width": 512
+```
+| 字段 | 说明 |
+|---|---|
+| `lut` | 自带 6 个：v11-street / cyber-neon / guofeng-ink / retro-film / anime-bright / voxel-pop（CC0），或 .cube 路径 |
+| `behind` | 这个词画在人身后：render 自动调 matte.py（rembg u2netp）出遮罩再合成；`matte_width` 越大边缘越细、越慢 |
+| `lyrics` | 终端风逐字打出（`> ` 开头、光标 `_`），等宽粗体，左下；`lyric_cps` 每秒几个字 |
+| `hud` | 四角等宽小字：标题、时间码、标签、闪烁 REC，加角标线 |
+| `ticker` | 横向滚动大字（跑马灯），长镜头用 |
+
+单独用的工具：
+```bash
+python3 $T/matte.py clips/03.mp4 masks/03.mp4          # 只出遮罩（白=人）
+python3 $T/grade.py out/mv.mp4 out/mv_graded.mp4 --lut retro-film
+python3 $T/grade.py frame.jpg lut_compare.jpg --compare  # 原片 + 6 个 LUT 对比图
+python3 $T/upscale.py out/mv_1080p.mp4 out/mv_4k.mp4    # Real-ESRGAN 有就用，否则 lanczos+unsharp
+```
+
 竖版：复制一份 `project_9x16.json`，`size` 改 `[1080, 1920]`，每个镜头按主体位置填 `focus`，`words.pos` 别用 `bottom`（底部约 1/5 会被平台界面挡住）。
 
 ## 2. 常用 ffmpeg 配方（都已在流萤机器上试过）
@@ -73,16 +98,15 @@ ffmpeg -y -ss 6.7 -t 0.4 -i out/mv_1080p.mp4 -vf "scale=384:-2,tile=6x2" -frames
 - 粗体：Heavy / Black 字重；描边 6 + 半透明黑，保证亮背景上也看得清。
 - 不压脸：人脸在中间时字放 `top`/`bottom` 或用 `box`；要字压在人身后 → 抠像，交给 Claude Code。
 
-## 4. 哪些要写代码
-| 效果 | render.py | 要 Claude Code |
+## 4. 谁来做
+| 效果 | 流萤机器上的脚本（默认） | Claude Code（可选增强） |
 |---|---|---|
-| 按重拍切、配歌、响度 | ✅ | |
-| 粗体大字踩拍、闪帧、缩放冲击、故障、颗粒、片尾 | ✅ | |
-| 竖版重新取景、半分辨率预览、粗剪 | ✅ | |
-| 人像抠像（字在人身后） | | ✅（rembg / mediapipe 逐帧抠） |
-| HUD、终端打字、逐字歌词、横向滚动字幕 | | ✅ |
-| 调色 LUT、光晕、只给脸加质感 | | ✅ |
-| 4K 超分（Real-ESRGAN） | | ✅ |
+| 切点、配歌、响度、粗剪、竖版取景 | render.py / plan.py | |
+| 大字踩拍、闪帧、缩放冲击、故障、颗粒、片尾 | render.py | |
+| 字压在人身后 | render.py + matte.py（rembg） | 逐帧精修边缘、头发丝 |
+| HUD、逐字歌词、跑马灯 | render.py | 定制动画（节点图、ASCII 转场） |
+| 调色 | grade.py + 6 个 CC0 LUT | 自定义调色、只给脸加质感 |
+| 4K | upscale.py（lanczos+锐化；有 Real-ESRGAN 就用） | 装 Real-ESRGAN / Topaz 精修 |
 
 ## 5. REVISION.md 模板（给 Claude Code）
 ```markdown
@@ -118,10 +142,21 @@ Verify before finishing: duration = {秒} ±0.05, each src used once, no word sp
 ```
 每一轮迭代：新建 `REVISION{N+1}.md`，开头 `Keep everything from v{N}.`，下面只列要改的条目和原因。
 
-## 6. Claude Code 命令（在项目文件夹里跑）
+## 6. Claude Code 命令（可选：只在主人想要脚本做不到的定制时用）
 ```bash
 cd /workspace/ember/projects/<名>
 claude -p "Read REVISION.md and implement it fully. Clips are in clips/, stills in stills/, song is audio/song.mp3, beats are in beatmap.json, shot table and words are in project.json. Write the render code in src/, then export out/<名>_v1_4k.mp4 (3840x2160) plus a 1080p review copy under 25MB. Run the checks listed in the Export section and print the results." --allowedTools "Bash,Read,Write,Edit"
 ```
 - 第一次用要先在那台电脑上登录 Claude Code（主人自己的账号）。`--allowedTools` 让它能直接跑 ffmpeg/python 而不用每步确认；不放心就去掉，在交互模式里逐条批准。
 - 跑完先看 `out/` 里的审片版，再抽帧对照 REVISION 逐条验收。
+
+## 7. 没有机器时：剪映步骤（交给主人）
+交付：`shots.md`（时间码表）、`clips/` `stills/`、`audio/song.mp3`、`words.txt`（每刀的大词）、LUT 文件。
+1. 剪映专业版 → 新建项目 → 导入全部素材和 song.mp3，歌拖到音轨。
+2. 选中音轨 → 「踩点」→「自动踩点 / 踩节拍 I」，出现黄色拍点；或照 shots.md 的时间码手动打点（M 键）。
+3. 按 shots.md 顺序把每个镜头拖上视频轨，首尾吸附到拍点；用「分割」裁到可用窗口。
+4. 文字：每刀新建一个文本，字体选最粗的（思源黑体 Heavy 等开源字体），入场动画「放大」或「闪现」，时长 = 这一刀。
+5. 特效：切点加「闪白」（2 帧），drop 加「故障 / RGB 分离」；整体加「胶片颗粒」。
+6. 调色：「调节」→「LUT」导入 .cube（自带 6 个）。
+7. 抠像：选中人像镜头 →「智能抠像」，复制一层放到文字上面，就能字压在人身后。
+8. 导出 1080p 30fps；竖版新建 9:16 草稿重新摆位。

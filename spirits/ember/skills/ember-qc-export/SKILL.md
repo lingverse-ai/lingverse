@@ -22,19 +22,21 @@ cd $P && python3 /workspace/ember/tools/qc.py out/mv_1080p.mp4 --expect 1920x108
 - 字：一刀一个词、不跨刀、踩拍、不出画、不压脸、只有一种语言、全是粗体。
 - 音频：接缝听不出来、结尾淡出、没有爆音。
 任何 ❌ → 回对应技能修（人物 → ember-stills / ember-clips；字和节奏 → ember-beat-edit）。
+- 抠像：字压在人身后的镜头，看头发和手的边缘有没有闪烁、有没有把字也抠出来；不行就把 `matte_width` 调到 768 重出，或去掉 `behind`。
 
 ## 3. 导出各版本（配方都在 ember-beat-edit 的 `edit-recipes.md` 第 2 节）
 | 文件 | 怎么出 |
 |---|---|
 | `out/mv_1080p.mp4` 16:9 母版 | `render.py project.json`（已出） |
 | `out/mv_9x16.mp4` 竖版 | 复制成 `project_9x16.json`，`size` 改 `[1080,1920]`，每个镜头填 `focus`，字不放底部 1/5，再 render；**重新取景，不是直接裁** |
-| `out/mv_4k.mp4`（可选） | 项目档案写了 4K：lanczos 放大或交给 Claude Code 做超分 |
+| `out/mv_4k.mp4`（可选） | 选了 4K：`python3 /workspace/ember/tools/upscale.py out/mv_1080p.mp4 out/mv_4k.mp4`（自己跑；Claude Code 精修是可选） |
 | `out/review.mp4` < 25MB | 审片版公式（按时长算码率） |
 | `out/cover_16x9.jpg`、`cover_9x16.jpg`、`cover_grid.jpg` | 从成片抽最好看的一帧；竖版封面从竖版抽 |
 竖版也要跑一次 qc.py（`--expect 1080x1920`）。
 
 ## 4. 关口 3：交给主人
-发：审片版 + 联系表 + QC.md 摘要（3 行以内）+ 各文件路径。问：「这是终版，确认吗？要改哪几处？」
+发：审片版 + 联系表 + QC.md 摘要（3 行以内）+ 各文件路径，再发提问组件：★确认终版 / 还要改（多选，选项同 ember-beat-edit 第 4 节的改版勾选，allowCustom）。
+没有机器时：交 ember-beat-edit 参考文件第 7 节的剪映步骤和素材包，质检清单照样给主人逐条对。
 主人点头后告诉他（每次都说）：
 - 发布由你来点；国内平台勾选「AI 生成」标识。
 - 抖音、小红书、微博画面和文案里不放链接、二维码、站外导流；X 可以在帖子里放链接。

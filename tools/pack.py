@@ -14,7 +14,7 @@ def build(spirit):
     version = (sp / "VERSION").read_text().strip()
     subst = {"{{OWNER}}": CONFIG["github_owner"], "{{VERSION}}": version}
     # install.sh 的 curl 兜底要逐个下载的工具和音乐文件（有 tools/、music/ 的灵才用得上）
-    for key, sub, pat in (("{{TOOL_FILES}}", "tools", "*.py"), ("{{MUSIC_FILES}}", "music", "*")):
+    for key, sub, pat in (("{{TOOL_FILES}}", "tools", "*.py"), ("{{MUSIC_FILES}}", "music", "*"), ("{{LUT_FILES}}", "luts", "*")):
         subst[key] = " ".join(sorted(f.name for f in (sp / sub).glob(pat) if f.is_file())) if (sp / sub).is_dir() else ""
 
     def fill(t):

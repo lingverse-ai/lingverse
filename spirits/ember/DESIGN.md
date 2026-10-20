@@ -12,7 +12,7 @@
 | 4 | ember-beat-storyboard | shots.md、project.json 骨架 | |
 | 5 | ember-stills | 每个镜头一张静帧（两张参考图） | |
 | 6 | ember-clips | 5 秒 720p 镜头 + 可用窗口 | |
-| 7 | ember-beat-edit | 粗剪 → 精剪；REVISION → Claude Code | 关口 2 |
+| 7 | ember-beat-edit | 粗剪 → 精剪（全部脚本自跑）→ 改版勾选；Claude Code 可选 | 关口 2 |
 | 8 | ember-qc-export | 19 坑 QC、16:9 / 9:16 / 4K / 审片版 / 封面 | 关口 3 |
 
 ## 工具（tools/，只依赖 python3 + numpy + ffmpeg）
@@ -23,11 +23,17 @@
 | plan.py | beatmap → 卡点切点 + project.json 骨架 |
 | render.py | project.json → 成片：图片推拉摇、视频取窗口、粗体大字踩拍、闪帧、缩放冲击、RGB 故障、颗粒、片尾、响度标准化；`--rough` `--preview` |
 | qc.py | 规格/响度/黑帧检查 + 联系表；`clips` 模式出素材 QC 表 |
+| matte.py | 人像抠像遮罩（rembg u2netp，CPU，可选依赖），给「字压在人身后」用 |
+| grade.py | 套 LUT 调色、出 LUT 对比图 |
+| upscale.py | 4K 放大：Real-ESRGAN 有就用，否则 lanczos + 锐化 |
+| make_luts.py | 生成 6 个 CC0 LUT（`luts/`） |
 | fonts.py | 找粗重中文字体（Source Han Sans Heavy / Noto Sans CJK Black，OFL），没有就下载 |
 | make_starter_music.py | 合成 3 首 CC0 自带曲 |
 
 ## 默认决定
-- 渲染：默认在流萤自己的机器上 ffmpeg + python；抠像、HUD、逐字歌词、调色 LUT、4K 超分写 REVISION 交给 Claude Code（`claude -p`）。
+- 渲染：全部在流萤自己的机器上 ffmpeg + python（含抠像、逐字歌词、HUD、跑马灯、LUT、4K 放大）；Claude Code 只是可选增强（`claude -p`）；没有机器就交镜头表 + 素材 + 剪映步骤。
+- 交互：所有选择用提问组件出选择题（多选、可自填），默认 v11 同款；成片后发「改版勾选」。
+- 风格预设：v11 同款（旗舰）+ 赛博街头、国风、复古胶片、动漫、方块世界（`ember-getting-started/styles.md`）。
 - 视频：默认 Grok Imagine；Seedance 可选（主人自己的账号）。不对口型。
 - 音乐：Suno 由主人登录操作，流萤给提示词并按档位提醒商用权；也可用自带 CC0 曲或外部免版权来源。
 - 主角：没有 IP 就默认主人本人；照片只存在主人自己的机器和记忆里。
