@@ -9,6 +9,10 @@ import io, json, os, subprocess, sys, urllib.request, zipfile
 from pathlib import Path
 
 CACHE = Path(os.environ.get("EMBER_HOME", "/workspace/ember")) / "fonts"
+try:
+    CACHE.mkdir(parents=True, exist_ok=True)
+except OSError:  # 没有 /workspace 写权限（如 CI）就放到用户缓存目录
+    CACHE = Path.home() / ".cache" / "ember" / "fonts"
 GH = "https://github.com"
 SPEC = {  # 文件名, 下载地址, 本机已装时可直接用的 fc-match 名
     "display": ("Anton-Regular.ttf", f"{GH}/google/fonts/raw/main/ofl/anton/Anton-Regular.ttf", "Anton"),

@@ -19,4 +19,4 @@ jobs:
       - name: tests (moling)
         run: python3 spirits/moling/tests/run_tests.py
       - name: tests (ember)
-        run: python3 spirits/ember/tests/run_tests.py
+        run: EMBER_HOME=$RUNNER_TEMP/ember python3 spirits/ember/tests/run_tests.py
