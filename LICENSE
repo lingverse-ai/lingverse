@@ -1,0 +1,15 @@
+许可证：待主人确认（PENDING OWNER APPROVAL）
+=========================================
+
+本文件是占位文件。正式许可证由仓库主人确认后替换。在确认之前，本仓库不授予任何许可。
+
+拟定方案 / Proposed:
+
+1. 内容（spirits/*/skills、spirits/*/examples、shared/、所有 .md 文档）
+   Creative Commons Attribution 4.0 International (CC BY 4.0)
+   https://creativecommons.org/licenses/by/4.0/
+
+2. 工具代码（tools/、spirits/*/tests/*.py、.github/）
+   MIT License
+
+Copyright (c) 2026 [OWNER_PENDING]

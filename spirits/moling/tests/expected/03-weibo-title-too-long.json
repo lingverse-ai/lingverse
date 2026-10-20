@@ -1,0 +1,6 @@
+{
+ "expect": [
+  "TITLE_TOO_LONG"
+ ],
+ "why": "微博标题 ≤32 字"
+}

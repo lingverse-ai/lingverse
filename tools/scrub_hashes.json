@@ -1,0 +1,59 @@
+{
+ "_note": "只存哈希。新增名单：python3 tools/scrub_hash.py <词>，把输出加进对应列表。",
+ "private": [
+  {
+   "sha256": "560cd6a6e4936fdb004127f3892813b48df2dc22163efa2819f3dd5ae14da9e7",
+   "len": 2
+  },
+  {
+   "sha256": "4508469620733480955b6216fad76cbc9d626908ff467abde542df641cca7eb0",
+   "len": 4
+  },
+  {
+   "sha256": "71da128173f685542720a484cc3b055903f1e7f2cc0928772ec2c02d4649fcf5",
+   "len": 8
+  },
+  {
+   "sha256": "a23fed2d5c45420f99bdbbc947fedc2aa9df3007426298677e6f759af8c18b10",
+   "len": 7
+  },
+  {
+   "sha256": "25d54762968c551d6d5d3d69a4b854a497f41cb02e27e0df7f68375a21208203",
+   "len": 7
+  },
+  {
+   "sha256": "d7ae6d90803cd6dbfbb630a201c088be0bb380f187a0c497068578ab731a173d",
+   "len": 4
+  }
+ ],
+ "creators": [
+  {
+   "sha256": "802284a82d70e92ade3a2bc91f79eebf7459feadcddd1b15c54eade18d6223fd",
+   "len": 6
+  },
+  {
+   "sha256": "efd4047c7f42e55308ef856cf2f00f54aaf4788f887c2d1c862dc55370d290cf",
+   "len": 9
+  },
+  {
+   "sha256": "68d532e62a167cef8c11b7d8c334942aca1148cb68dd5ca0b577325b0467b467",
+   "len": 3
+  },
+  {
+   "sha256": "35f85825b9016fcc7818aca22298dc88a92ba6e4f029366ff8acbb3f823152d4",
+   "len": 7
+  },
+  {
+   "sha256": "64d7a3e4cfba552acb47b6a68b3eefb9c7a9d57639e5f17dc8cf4037ef01700d",
+   "len": 12
+  },
+  {
+   "sha256": "7685827a07593b0fe3fbf9d7992b1d8e0e6ee07e7bc7c732e6d9b35a690afebc",
+   "len": 15
+  },
+  {
+   "sha256": "c0e7c9f31054f1ac234982646d6e0e5cca1f649f5edcb8384795cd878dcf7019",
+   "len": 11
+  }
+ ]
+}

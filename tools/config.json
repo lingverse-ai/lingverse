@@ -1,0 +1,5 @@
+{
+  "github_owner": "OWNER_PENDING",
+  "repo": "lingverse",
+  "limits": {"skill_bytes": 6144, "total_bytes": 81920, "profile_bytes": 3072, "description_chars": 400}
+}
