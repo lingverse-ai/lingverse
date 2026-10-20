@@ -8,12 +8,13 @@
     "description_chars": 400
   },
   "private_allow": {
-    "_note": "版权署名是公开信息，只在这两个文件里放行这一个哈希；技能、示例照常扫描。",
+    "_note": "公开信息放行：LICENSE/README 里的版权署名，README 路线图里的产品名。只放行这些哈希，技能和示例照常扫描。",
     "LICENSE": [
       "560cd6a6e4936fdb004127f3892813b48df2dc22163efa2819f3dd5ae14da9e7"
     ],
     "README.md": [
-      "560cd6a6e4936fdb004127f3892813b48df2dc22163efa2819f3dd5ae14da9e7"
+      "560cd6a6e4936fdb004127f3892813b48df2dc22163efa2819f3dd5ae14da9e7",
+      "25d54762968c551d6d5d3d69a4b854a497f41cb02e27e0df7f68375a21208203"
     ]
   }
 }

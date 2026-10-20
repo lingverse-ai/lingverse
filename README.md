@@ -77,10 +77,13 @@
 
 | 灵 | 职能 | 状态 |
 |---|---|---|
-| 墨灵 Moling | 长文写手 | ✅ v0.1.0 |
-| 流萤 | MV 与视频 | 筹备中 |
-| 听潮 | 短视频与口播 | 筹备中 |
-| 更多灵 | — | 敬请期待 |
+| 墨灵 Moling | 长文 | ✅ v0.1.0 |
+| 流萤 Ember | MV | 筹备中 |
+| 朱砂 Cinnabar | 海报 | 筹备中 |
+| 听潮 Tide | 声音 | 筹备中 |
+| 算盘子 Abacus | 成交（XY Skill） | 筹备中 |
+| 问樵 Sage | 战略 | 筹备中 |
+| 守夜 Nightwatch | 雷达与复盘 | 筹备中 |
 
 ## 常见问题
 
@@ -131,5 +134,5 @@ assets/            图片素材
 - **Install:** import Moling from its share link (coming soon). On first chat it installs its full skill set from a pinned tag of this repo. No plugins, no keys.
 - **Update:** say 「更新」 ("update"). Moling checks at most weekly, summarises what changed, and installs only after you say yes. Your profiles are never overwritten.
 - **Skills:** onboarding, voice profile, topic and title, structure and opening, first draft, de-AI edit, multi-platform rewrite, covers and images, and a pre-publish check, plus install and update.
-- **Roadmap:** 流萤 (music video), 听潮 (short video), and more spirits to come.
+- **Roadmap:** 墨灵 Moling, long-form (✅ v0.1.0); 流萤 Ember, MV; 朱砂 Cinnabar, posters; 听潮 Tide, voice; 算盘子 Abacus, closing deals (XY Skill); 问樵 Sage, strategy; 守夜 Nightwatch, radar and review.
 - **License:** © 2026 小爷. Content and skills under CC BY 4.0; tooling (`tools/`, `tests/`, `.github/`) under MIT.
