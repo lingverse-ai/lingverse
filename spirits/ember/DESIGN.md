@@ -27,7 +27,10 @@
 | grade.py | 套 LUT 调色、出 LUT 对比图 |
 | upscale.py | 4K 放大：Real-ESRGAN 有就用，否则 lanczos + 锐化 |
 | make_luts.py | 生成 6 个 CC0 LUT（`luts/`） |
-| fonts.py | 找粗重中文字体（Source Han Sans Heavy / Noto Sans CJK Black，OFL），没有就下载 |
+| fonts.py | 默认字体全部 OFL、自动下载到 $EMBER_HOME/fonts：拉丁大字 Anton（v11 同款超粗窄体）、中文 思源黑体 Heavy、等宽 JetBrains Mono ExtraBold、像素 Fusion Pixel |
+| state.py | 项目进度表 8 步 + 下一步命令；DECISIONS.md 原话记录；gates.json 关口；后台任务 RUNS.md（换对话可续） |
+| lyrics_align.py | 歌词对时间：faster-whisper 出词时间，对齐到主人写的歌词（可选，`--even` 兜底） |
+| audit.py | 剪辑工程自检：切点在拍上、歌词关 N/N、开头钩子、≥3 层、闪烁、片尾卡 |
 | make_starter_music.py | 合成 3 首 CC0 自带曲 |
 
 ## 默认决定

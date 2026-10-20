@@ -13,7 +13,7 @@ description: >-
 ```bash
 cd $P && python3 /workspace/ember/tools/qc.py out/mv_1080p.mp4 --expect 1920x1080 --dur <秒> --sheet out/final_sheet.jpg --every 0.5
 ```
-查：分辨率、时长 ±0.15s、yuv420p、有音轨、响度 -16～-9 LUFS、真峰值 ≤ -0.5 dB、中途没有黑帧。FAIL 就回 ember-beat-edit 修，不要硬交。
+查：分辨率、时长 ±0.15s、yuv420p、有音轨、响度 -16～-9 LUFS、真峰值 ≤ -0.5 dB、中途没有黑帧、1 秒内不超过 3 次闪（光敏）、带 BT.709 色彩标记。FAIL 就回 ember-beat-edit 修，不要硬交。
 
 ## 2. 人眼检查（看联系表 + 整片看一遍）
 按 `pitfalls.md` 第 1 节 19 条逐条过，**每条写结论**（✅ / ❌ + 秒数），存 `$P/out/QC.md`。重点：
@@ -30,14 +30,17 @@ cd $P && python3 /workspace/ember/tools/qc.py out/mv_1080p.mp4 --expect 1920x108
 | `out/mv_1080p.mp4` 16:9 母版 | `render.py project.json`（已出） |
 | `out/mv_9x16.mp4` 竖版 | 复制成 `project_9x16.json`，`size` 改 `[1080,1920]`，每个镜头填 `focus`，字不放底部 1/5，再 render；**重新取景，不是直接裁** |
 | `out/mv_4k.mp4`（可选） | 选了 4K：`python3 /workspace/ember/tools/upscale.py out/mv_1080p.mp4 out/mv_4k.mp4`（自己跑；Claude Code 精修是可选） |
-| `out/review.mp4` < 25MB | 审片版公式（按时长算码率） |
+| `out/review.mp4` < 25MB | `qc.py share out/mv_1080p.mp4 out/review.mp4 --max-mb 25` |
+| `out/share.mp4` < 190MB | `qc.py share …`（微信/网盘发送用；更大的文件给网盘链接） |
+| 发布文案（存 out 目录，POST 文本） | 标题、3 行文案、话题标签、「AI 生成」声明、音乐来源/署名；只是草稿 |
 | `out/cover_16x9.jpg`、`cover_9x16.jpg`、`cover_grid.jpg` | 从成片抽最好看的一帧；竖版封面从竖版抽 |
 竖版也要跑一次 qc.py（`--expect 1080x1920`）。
 
 ## 4. 关口 3：交给主人
 发：审片版 + 联系表 + QC.md 摘要（3 行以内）+ 各文件路径，再发提问组件：★确认终版 / 还要改（多选，选项同 ember-beat-edit 第 4 节的改版勾选，allowCustom）。
 没有机器时：交 ember-beat-edit 参考文件第 7 节的剪映步骤和素材包，质检清单照样给主人逐条对。
-主人点头后告诉他（每次都说）：
+自评分（写进 QC.md，1–5 分）：人像一致、卡点、字效、画面层次、调色、声音。任何一项 <4 或没写分 = 不交，回去修。
+主人点头后 `state.py gate <目录> final ok`，告诉他（每次都说）：
 - 发布由你来点；国内平台勾选「AI 生成」标识。
 - 抖音、小红书、微博画面和文案里不放链接、二维码、站外导流；X 可以在帖子里放链接。
 - 用的是 Suno 的歌：确认是在 Pro / Premier 订阅期内生成并下载的才能商用；用 Incompetech 的曲子：简介里写署名。

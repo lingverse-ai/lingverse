@@ -37,6 +37,9 @@ description: >-
 - 没有照片又没有 IP：先做一个原创 IP（模板第 4 节），主人确认后再用。
 - 不能生图（工具不可用）：把提示词整理好，让主人在别的工具里生成后发回。
 
-## 5. 关口 1
+## 5. 4 张试镜图（关口 1 之前必须有）
+锁定清单写好后，按 LOCK 出同一个人在本片场景里的 4 张试镜：特写 CU、半身 MCU、全身 FS、远景 WS（`ref/test_cu.png` …）。四张都像、衣服都对，才算锁住；哪张不像就改 LOCK 文字或参考图再出（改源头，不在后面一帧帧修）。把 4 张和资产一起拼进 bible_sheet。
+
+## 6. 关口 1
 把 4 张资产拼成一张给主人看（`ffmpeg -i turnaround.png -i face.png -filter_complex "[0]scale=-2:720[a];[1]scale=-2:720[b];[a][b]hstack" bible_sheet.jpg`），附中文锁定清单，问：「这就是 MV 里的你，确认吗？哪一项要改？」
-主人确认后：把锁定清单英文全文写进项目档案（记忆），进度改成「角色圣经 ✅」，进 ember-lyrics-song。
+主人确认后：`state.py decide <目录> "原话"` + `state.py gate <目录> lead ok`，把锁定清单英文全文写进项目档案（记忆），进度改成「角色圣经 ✅」，进 ember-lyrics-song。

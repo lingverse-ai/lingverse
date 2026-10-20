@@ -78,5 +78,27 @@ fxj = tmp / "fx.json"; fxj.write_text(json.dumps(fx)); py(T / "render.py", fxj, 
 if (tmp / "fx.mp4").exists(): print("fx render:", probe(tmp / "fx.mp4"))
 print("grade / upscale / fx ok" if not fails else "")
 
+# 6. 流程工具：进度表 / 决定记录 / 后台任务、自检、歌词对时间（--even）、鼓点顶镜头 + 片段、分享版、闪烁检查
+pd = tmp / "proj"; py(T / "state.py", "gate", pd, "brief", "ok"); py(T / "state.py", "decide", pd, "主人：要 v11 同款")
+st = py(T / "state.py", "status", pd).stdout
+if "✅ 1" not in st or "下一步" not in st or "v11 同款" not in (pd / "DECISIONS.md").read_text(): fails.append("state.py 进度/记录不对")
+lt = tmp / "l.txt"; lt.write_text("[Hook]\nFUTURE ON THE BLOCK\n未来就在眼前\n", encoding="utf-8")
+py(T / "lyrics_align.py", M / "ember-neon-140.mp3", lt, tmp / "w.json", "--even", "1", "5")
+wj = json.loads((tmp / "w.json").read_text()); 
+if len(wj["words"]) != 10 or len(wj["lines"]) != 2: fails.append(f"lyrics_align 词数不对 {len(wj['words'])}")
+au = json.loads(ex.read_text()); au["lyrics"] = wj["lines"]; au["punch_on"] = [2.0, 4.0]; au["audio"] = str(M / "ember-neon-140.mp3")
+aj = tmp / "au.json"; aj.write_text(json.dumps(au, ensure_ascii=False))
+r = py(T / "audit.py", aj, "--words", tmp / "w.json")
+if "歌词关 2/2" not in r.stdout: fails.append("audit 歌词关没过：" + r.stdout[-200:])
+au["lyrics"] = []; aj.write_text(json.dumps(au))
+if subprocess.run([sys.executable, str(T / "audit.py"), str(aj), "--words", str(tmp / "w.json")], capture_output=True).returncode == 0: fails.append("audit 漏词没拦住")
+py(T / "render.py", aj, tmp / "ex.mp4", "--preview", "--excerpt", "2-6")
+if not (tmp / "ex.mp4").exists() or abs(probe(tmp / "ex.mp4")[2] - 4) > 0.15: fails.append("--excerpt 片段长度不对")
+r = py(T / "qc.py", tmp / "ex.mp4", "--dur", "4")
+if "BT.709" in r.stdout or "闪烁" in r.stdout: fails.append("qc 色彩标记/闪烁误报：" + r.stdout[-200:])
+py(T / "qc.py", "share", tmp / "ex.mp4", tmp / "sh.mp4", "--max-mb", "2")
+if not (tmp / "sh.mp4").exists() or (tmp / "sh.mp4").stat().st_size > 2.2e6: fails.append("分享版超大小")
+print("state / audit / align / excerpt / share ok" if not fails else "")
+
 print("FAILED:\n- " + "\n- ".join(fails) if fails else "ALL PASS")
 sys.exit(1 if fails else 0)

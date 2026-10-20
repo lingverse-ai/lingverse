@@ -16,7 +16,9 @@ description: >-
 
 ## 1. 填 project.json（分镜阶段 plan.py 已出骨架）
 - `shots`：`src`、`in`/`out`（首尾相接铺满）、`src_start`（可用窗口起点）、`focus`（竖版取景）。每个素材只用一次。
-- 项目档案的选项 → 字段：LUT → `lut`；抠像开 → 大词加 `"behind": true`；HUD → `hud`；逐字歌词 → `lyrics`；跑马灯 → `ticker`；闪帧/故障 → `flash_on`/`glitch_on`；颗粒 → `grain`；片尾 → `endcard`。字体按预设（像素字体 → `font` 指向 Fusion Pixel）。
+- 项目档案的选项 → 字段：LUT → `lut`；抠像开 → 大词加 `"behind": true`；HUD → `hud`；逐字歌词 → `lyrics`；跑马灯 → `ticker`；闪帧/故障 → `flash_on`/`glitch_on`；颗粒 → `grain`；片尾 → `endcard`。字体默认自动选（拉丁 Anton、中文思源黑体 Heavy，fonts.py 自动下载；像素风 `font: "pixel"`）。
+- 有 `words.json`：`lyrics` 用它的 `lines`；`punch_on` 填 beatmap 的 `accent_hits`/`big_drops`（镜头跟鼓点顶一下，`punch` 默认 0.06）。
+- 写完跑 `python3 $T/audit.py project.json`：切点在拍上、歌词关 N/N、开头钩子、≥3 层、闪烁不过密。不 PASS 不渲染。
 
 ## 2. 粗剪（关口 2）
 ```bash
@@ -29,7 +31,8 @@ python3 $T/qc.py out/rough.mp4 --sheet out/rough_sheet.jpg --every 1
 ```bash
 python3 $T/grade.py stills/03.png out/lut_compare.jpg --compare   # 想换滤镜时出 7 宫格对比图
 python3 $T/render.py project.json out/preview.mp4 --preview        # 半分辨率先看
-python3 $T/render.py project.json out/mv_1080p.mp4                 # 正式
+python3 $T/render.py project.json out/excerpt.mp4 --preview --excerpt 8-30   # 先出 20–40 秒最精彩的一段给主人看（gate excerpt）
+python3 $T/render.py project.json out/mv_1080p.mp4                 # 正式（超过 2 分钟就用 state.py run 放后台）
 python3 $T/upscale.py out/mv_1080p.mp4 out/mv_4k.mp4               # 选了 4K 才跑
 ```
 - 有 `behind` 词时 render 会自动调 matte.py 抠像（rembg，CPU 约 0.1 秒/帧）。报 `MATTE_DEPS_MISSING` → `pip install "rembg[cpu]"`；装不上就把 `behind` 去掉，字放 top/bottom 避开脸，告诉主人。

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 流萤安装脚本（pack.py 填入版本后生成 dist/install.sh）。不需要 gh，不需要登录。
 # 用法：curl -fsSL https://raw.githubusercontent.com/{{OWNER}}/lingverse/ember-v{{VERSION}}/spirits/ember/dist/install.sh | bash
-# 做三件事：10 个技能写进技能目录；渲染工具、自带音乐和 LUT 放到 $EMBER_HOME（默认 /workspace/ember）；检查 ffmpeg / numpy / rembg（可选）。
+# 做三件事：10 个技能写进技能目录；渲染工具、自带音乐和 LUT 放到 $EMBER_HOME（默认 /workspace/ember）；检查 ffmpeg / numpy / rembg、faster-whisper（可选）。
 export GIT_TERMINAL_PROMPT=0
 T=ember-v{{VERSION}}; R=https://github.com/{{OWNER}}/lingverse
 RAWB=https://raw.githubusercontent.com/{{OWNER}}/lingverse/$T/spirits/ember
@@ -36,4 +36,5 @@ PY
 command -v ffmpeg >/dev/null || echo "DEPS_MISSING ffmpeg（sudo apt-get install -y ffmpeg 或 brew install ffmpeg）"
 python3 -c "import numpy" 2>/dev/null || pip install -q numpy 2>/dev/null || pip install -q --user numpy 2>/dev/null || python3 -m pip install -q --break-system-packages numpy 2>/dev/null || echo "DEPS_MISSING numpy（pip install numpy）"
 python3 -c "import rembg" 2>/dev/null || pip install -q "rembg[cpu]" 2>/dev/null || python3 -m pip install -q --break-system-packages "rembg[cpu]" 2>/dev/null || echo "OPTIONAL_MISSING rembg（抠像不可用，其余功能正常）"
+python3 -c "import faster_whisper" 2>/dev/null || pip install -q faster-whisper 2>/dev/null || python3 -m pip install -q --break-system-packages faster-whisper 2>/dev/null || echo "OPTIONAL_MISSING faster-whisper（歌词自动对时间不可用，可用 --even 粗分配）"
 ls "$H/tools/render.py" >/dev/null 2>&1 && echo "TOOLS_OK $H/tools" || echo "TOOLS_MISSING $H/tools"

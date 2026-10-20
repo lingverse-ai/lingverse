@@ -1,13 +1,20 @@
 """project.json → 成片 mp4（ffmpeg 一把出）。只依赖 python3 + ffmpeg。
-用法：python3 render.py project.json out.mp4 [--preview] [--rough]
+用法：python3 render.py project.json out.mp4 [--preview] [--rough] [--excerpt 8-30]
   进阶字段：lut（调色）、words[].behind（字压在人身后，需 rembg）、lyrics（逐字歌词）、hud、ticker（跑马灯）
-  --preview = 半分辨率快速预览；--rough = 粗剪（只有镜头和歌，不加字/闪/颗粒）
+  --preview 半分辨率；--rough 粗剪（只有镜头和歌）；--excerpt A-B 只出 A–B 秒片段先审
+  punch_on（鼓点时间表）= 镜头跟鼓点顶一下；输出带 BT.709 色彩标记
 project.json 字段见 ember-beat-edit/edit-recipes.md；所有时间单位为秒，都是成片时间轴。"""
 import json, os, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from fonts import find_font
+from fonts import find_font, font_for
+
+
+def pick_font(spec, text):
+    """spec：None=按文字自动（英文 Anton / 中文思源黑体 Heavy）；display|cjk|mono|pixel；或字体文件路径。"""
+    if not spec: return font_for(text)
+    return find_font(spec) if spec in ("display", "cjk", "mono", "pixel") else spec
 
 IMG = {".png", ".jpg", ".jpeg", ".webp"}
 
@@ -55,26 +62,26 @@ def shot_segment(s, w, h, fps, base, out):
     return n
 
 
-def fit(text, size, w, frac=0.88):
-    """字太长就缩小，保证不出画：中日韩字按 1em 估宽，其余按 0.62em。"""
-    em = sum(1.0 if ord(c) > 0x2E80 else 0.62 for c in text) or 1
+def fit(text, size, w, frac=0.9, latin=0.62):
+    """字太长就缩小，保证不出画：中日韩字按 1em 估宽，拉丁字按 latin em（Anton 这类压缩体约 0.5）。"""
+    em = sum(1.0 if ord(c) > 0x2E80 else latin for c in text) or 1
     return min(size, frac * w / em)
 
 
 def mono_font():
-    r = subprocess.run(["fc-match", "-f", "%{file}", "monospace:bold"], capture_output=True, text=True)
-    return r.stdout or find_font()
+    return find_font("mono")
 
 
 def word_filter(wd, w, h, k, font):
     pos = {"center": ("(w-text_w)/2", "(h-text_h)/2"), "top": ("(w-text_w)/2", "h*0.12"),
            "bottom": ("(w-text_w)/2", "h*0.80-text_h"), "left": ("w*0.07", "(h-text_h)/2")}
     a, b = wd["t"], wd.get("until", wd["t"] + 0.5)
-    size = fit(wd["text"], wd.get("size", 170) * k, w)
+    font = pick_font(wd.get("font") or font, wd["text"])
+    size = fit(wd["text"], wd.get("size", 240) * k, w, latin=0.44 if "Anton" in font else 0.62)
     pop = f"{size:.0f}*(1+0.05*clip(1-(t-{a})/0.1,0,1))"  # 105%→100% 缩放冲击，约 3 帧
     x, y = pos.get(wd.get("pos", "center"), pos["center"])
     box = f":box=1:boxcolor={wd['box']}:boxborderw={int(28 * k)}" if wd.get("box") else ""
-    return (f"drawtext=fontfile='{font}':expansion=none:textfile='{esc(wd['text'])}':fontsize='{pop}':fontcolor={wd.get('color', 'white')}"
+    return (f"drawtext=fontfile='{font}':expansion=none:textfile='{esc(wd['text'])}':fontsize='{pop}':fontcolor={wd.get('color', '#EFE6D2')}"
             f":borderw={int(wd.get('border', 6) * k)}:bordercolor=black@0.85{box}:x={x}:y={y}:enable='between(t,{a},{b})'")
 
 
@@ -111,13 +118,18 @@ def hud_lyrics_ticker(p, w, h, fps, font, k):
     for tk in p.get("ticker", []):  # 横向滚动字幕（跑马灯）
         a, b = tk["from"], tk["to"]; sp = tk.get("speed", 600) * k
         size = int(tk.get("size", 140) * k); y = f"h*{tk.get('y', 0.5)}-text_h/2"
-        f.append(f"drawtext=fontfile='{font}':expansion=none:textfile='{esc(tk['text'])}':fontsize={size}:fontcolor={tk.get('color', 'white')}"
+        f.append(f"drawtext=fontfile='{pick_font(tk.get('font') or font, tk['text'])}':expansion=none:textfile='{esc(tk['text'])}':fontsize={size}:fontcolor={tk.get('color', 'white')}"
                  f":borderw={int(5 * k)}:bordercolor=black@0.8:x=w-mod((t-{a})*{sp:.0f}\\,w+text_w):y={y}:enable='between(t,{a},{b})'")
     return f
 
 
 def overlay_chain(p, w, h, fps, font):
     f, k = [], min(w, h) / 1080  # 字号按短边 1080 设计，横竖版都按短边缩放
+    hits = p.get("punch_on", [])  # 镜头跟着鼓点"顶"一下：落点瞬间放大 punch 倍，0.25s 内回落
+    if hits:
+        amt = p.get("punch", 0.06)
+        z = "+".join(f"{amt}*between(t,{t},{t + 0.25:.3f})*(1-(t-{t})/0.25)" for t in hits)
+        f.append(f"scale=w='trunc({w}*(1+{z})/2)*2':h='trunc({h}*(1+{z})/2)*2':eval=frame,crop={w}:{h}")
     for t in p.get("flash_on", []):  # 白闪 1–2 帧
         f.append(f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.85:t=fill:enable='between(t,{t},{t + 1.5 / fps:.4f})'")
     for t in p.get("glitch_on", []):  # 大落点 2 帧 RGB 错位
@@ -130,20 +142,20 @@ def overlay_chain(p, w, h, fps, font):
     if ec:
         a = ec["from"]
         f.append(f"drawbox=x=0:y=0:w=iw:h=ih:color=black@0.55:t=fill:enable='gte(t,{a})'")
-        f.append(f"drawtext=fontfile='{font}':expansion=none:textfile='{esc(ec['text'])}':fontsize={int(fit(ec['text'], ec.get('size', 150) * k, w))}:fontcolor=white"
+        f.append(f"drawtext=fontfile='{pick_font(ec.get('font') or font, ec['text'])}':expansion=none:textfile='{esc(ec['text'])}':fontsize={int(fit(ec['text'], ec.get('size', 150) * k, w))}:fontcolor=white"
                  f":x=(w-text_w)/2:y=(h-text_h)/2-{int(40 * k)}:alpha='clip((t-{a})/0.3,0,1)':enable='gte(t,{a})'")
         if ec.get("sub"):
-            f.append(f"drawtext=fontfile='{font}':expansion=none:textfile='{esc(ec['sub'])}':fontsize={int(56 * k)}:fontcolor=white@0.9"
+            f.append(f"drawtext=fontfile='{pick_font(ec.get('font') or font, ec['sub'])}':expansion=none:textfile='{esc(ec['sub'])}':fontsize={int(56 * k)}:fontcolor=white@0.9"
                      f":x=(w-text_w)/2:y=h/2+{int(90 * k)}:alpha='clip((t-{a}-0.2)/0.3,0,1)':enable='gte(t,{a})'")
     if p.get("grain", 4):
         f.append(f"noise=alls={p.get('grain', 4)}:allf=t")
     fade = p.get("fade", 0.6)
     f.append(f"fade=t=out:st={p['duration'] - fade:.3f}:d={fade}")
-    f.append("format=yuv420p")
+    f.append("format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv")
     return ",".join(f)
 
 
-def render(pj, out, preview=False, rough=False):
+def render(pj, out, preview=False, rough=False, excerpt=None):
     pj = Path(pj); p = json.loads(pj.read_text(encoding="utf-8")); base = pj.parent
     if rough:  # 粗剪：只有镜头 + 歌，不加字、不闪、不颗粒（v11 第 6 步）
         p = dict(p, words=[], flash_on=[], glitch_on=[], grain=0, endcard=None, lyrics=[], ticker=[], hud=None, lut=None)
@@ -154,7 +166,7 @@ def render(pj, out, preview=False, rough=False):
     assert abs(shots[0]["in"]) < 1e-6 and abs(shots[-1]["out"] - dur) < 0.05, "shots 必须从 0 铺满到 duration"
     for a, b in zip(shots, shots[1:]):
         assert abs(a["out"] - b["in"]) < 1e-3, f"镜头之间有缝/重叠：{a['out']} vs {b['in']}"
-    font = p.get("font") or find_font()
+    font = p.get("font")  # None = 按文字自动选（Anton / 思源黑体 Heavy）
     tmp = Path(tempfile.mkdtemp(prefix="ember-"))
     try:
         segs, frames = [], 0
@@ -181,12 +193,16 @@ def render(pj, out, preview=False, rough=False):
                      f"[t][b0][m]maskedmerge[mm];[mm]{vf}[v]")
         else:
             graph = f"[0:v]{pre}{vf}[v]"
+        if excerpt:  # 先出 20–40s 片段给主人看，确认了再出整片
+            graph = graph[:-3] + f",trim=start={excerpt[0]}:end={excerpt[1]},setpts=PTS-STARTPTS[v]"
         cmd += ["-filter_complex", graph, "-map", "[v]"]
         if p.get("audio"):
             fade = p.get("fade", 0.6)
             cmd += ["-map", "1:a", "-af", f"afade=t=in:d=0.03,afade=t=out:st={dur - fade:.3f}:d={fade}" + (",loudnorm=I=-14:TP=-1.5:LRA=11,alimiter=limit=0.85:level=disabled" if p.get("loudnorm", True) else ""), "-c:a", "aac", "-b:a", "192k"]
-        cmd += ["-t", str(dur), "-c:v", "libx264", "-preset", "medium", "-crf", "23" if preview else str(p.get("crf", 18)),
-                "-pix_fmt", "yuv420p", "-r", str(fps), "-movflags", "+faststart", str(out)]
+            if excerpt: cmd[-5] += f",atrim=start={excerpt[0]}:end={excerpt[1]},asetpts=PTS-STARTPTS"
+        cmd += ["-t", str(dur if not excerpt else excerpt[1] - excerpt[0]), "-c:v", "libx264", "-preset", "medium", "-crf", "23" if preview else str(p.get("crf", 18)),
+                "-pix_fmt", "yuv420p", "-r", str(fps),
+                "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv", "-movflags", "+faststart", str(out)]
         run(cmd)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -197,4 +213,8 @@ def render(pj, out, preview=False, rough=False):
 if __name__ == "__main__":
     a = [x for x in sys.argv[1:] if not x.startswith("--")]
     if len(a) < 2: sys.exit(__doc__)
-    render(a[0], a[1], "--preview" in sys.argv, "--rough" in sys.argv)
+    ex = None
+    if "--excerpt" in sys.argv:
+        i = sys.argv.index("--excerpt"); ex = tuple(float(x) for x in sys.argv[i + 1].split("-"))
+        a = [x for x in a if x != sys.argv[i + 1]]
+    render(a[0], a[1], "--preview" in sys.argv, "--rough" in sys.argv, ex)

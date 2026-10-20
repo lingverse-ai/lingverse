@@ -48,7 +48,9 @@ python3 /workspace/ember/tools/songcut.py full.wav song.mp3 --ranges 7.964-14.79
 ```bash
 python3 /workspace/ember/tools/beatmap.py song.mp3 ../beatmap.json --bpm <BPM>
 ```
-字段：`duration bpm beats downbeats accent_hits big_drops sections`。有歌词就手工加 `lyrics: [{t, text}]`（时间用耳朵对，或者机器转写只拿时间、文字用自己写的）。
+字段：`duration bpm beats downbeats accent_hits big_drops sections`。有歌词：把主人确认的歌词存 `$P/lyrics.txt`（一行一句），跑
+`python3 /workspace/ember/tools/lyrics_align.py song.mp3 ../lyrics.txt ../words.json`
+（whisper 只提供时间，文字永远用主人的；命中 <60% 或没装 whisper 就 `--even 起 止` 粗分，再用耳朵改）。`words.json` 的 `lines` 直接进 project.json 的 `lyrics`，`words` 让大字落在唱到那个词的瞬间：**字跟人声，动作跟拍子**。纯音乐：建空文件 `$P/lyrics.none`。
 
 ## 7. 收尾
 告诉主人：时长、BPM、重拍数、几个大落点（big_drops）在哪几秒。项目档案进度改「歌 ✅」，进 ember-beat-storyboard。

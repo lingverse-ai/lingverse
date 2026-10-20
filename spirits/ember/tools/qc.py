@@ -1,6 +1,8 @@
 """成片/素材质检：时长、分辨率、帧率、码率、响度、黑帧，外加一张联系表（contact sheet）。
 用法：python3 qc.py video.mp4 [--expect 1920x1080] [--dur 30] [--sheet out.jpg] [--every 1]
-      python3 qc.py clips qc.jpg clips/*.mp4     （素材 QC 表：每条 5 帧一行）"""
+      python3 qc.py clips qc.jpg clips/*.mp4     （素材 QC 表：每条 5 帧一行）
+      python3 qc.py share master.mp4 share.mp4 [--max-mb 190]   （压一份发微信/网盘用的分享版）
+成片检查还包括：闪烁（任意 1 秒内亮度大跳 >6 次 = 超过 3 次闪，光敏风险）和 BT.709 色彩标记。"""
 import json, re, subprocess, sys
 
 
@@ -58,10 +60,40 @@ def clip_sheet(clips, out, n=5):
     return out
 
 
+def flashes(path):
+    """逐帧平均亮度（缩到 64 宽算，快）→ 亮度跳变 >50/255 记一次；返回最密的 1 秒内的次数和时间。"""
+    r = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-vf", "scale=64:-2,format=gray", "-f", "rawvideo", "-"],
+                       capture_output=True, check=True).stdout
+    pr = probe(path); v = next(x for x in pr["streams"] if x["codec_type"] == "video")
+    n, d = map(int, v["r_frame_rate"].split("/")); fps = n / d
+    w = 64; h = len(r) // w // max(1, int(float(pr["format"]["duration"]) * fps + 0.5))
+    import numpy as np
+    a = np.frombuffer(r, np.uint8)[: (len(r) // (w * h)) * w * h].reshape(-1, w * h).mean(1)
+    jumps = np.nonzero(np.abs(np.diff(a)) > 50)[0] / fps
+    worst, at = 0, None
+    for t in jumps:
+        c = int(((jumps >= t) & (jumps < t + 1)).sum())
+        if c > worst: worst, at = c, round(float(t), 2)
+    return worst, at
+
+
+def share(src, out, max_mb=190):
+    dur = float(probe(src)["format"]["duration"])
+    kbps = int(max_mb * 8000 * 0.92 / dur) - 192
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-vf", "setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709", "-c:v", "libx264", "-preset", "medium", "-b:v", f"{min(kbps, 20000)}k",
+                    "-maxrate", f"{min(kbps, 20000) * 2}k", "-bufsize", f"{min(kbps, 20000) * 2}k", "-pix_fmt", "yuv420p",
+                    "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",
+                    "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", out], check=True)
+    return out
+
+
 def main():
     a = sys.argv[1:]
     if a and a[0] == "clips":  # python3 qc.py clips out.jpg a.mp4 b.mp4 …
         print("QC 表:", clip_sheet(a[2:], a[1])); return
+    if a and a[0] == "share":
+        o = a[2]; mx = float(a[a.index("--max-mb") + 1]) if "--max-mb" in a else 190
+        share(a[1], o, mx); print(f"分享版 {o}  {probe(o)['format']['size'] and int(probe(o)['format']['size']) / 1e6:.1f}MB"); return
     path = a[0]
     opt = lambda k, d=None: a[a.index(k) + 1] if k in a else d
     info = probe(path); v = next(s for s in info["streams"] if s["codec_type"] == "video")
@@ -79,6 +111,9 @@ def main():
     if lufs is not None and not -16 <= lufs <= -9: problems.append(f"响度 {lufs} LUFS（建议 -14±2）")
     if tp is not None and tp > -0.5: problems.append(f"真峰值 {tp} dBFS 过高（会破音）")
     if [b for b in blacks if float(b[0]) < dur - 1.0]: problems.append(f"中途黑帧 {blacks}")
+    fl, fat = flashes(path)
+    if fl > 6: problems.append(f"闪烁过密：{fat}s 起 1 秒内亮度大跳 {fl} 次（>3 次闪/秒，减少 flash_on）")
+    if v.get("color_primaries") not in (None, "bt709") or "color_primaries" not in v: problems.append("缺 BT.709 色彩标记（用 render.py 重新出，或 qc.py share）")
     print(f"{path}: {size} {fps:.2f}fps {dur:.2f}s {mb:.1f}MB 音轨={'有' if au else '无'} 响度={lufs} LUFS 峰值={tp}")
     if opt("--sheet"): print("联系表:", sheet(path, opt("--sheet"), float(opt("--every", 1))))
     print("PASS" if not problems else "问题:\n- " + "\n- ".join(problems))

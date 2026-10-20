@@ -6,6 +6,8 @@
 - 新增 流萤 Ember（`spirits/ember`，VERSION 0.1.0，标签待主人审完技能后再打）：10 个技能（入门、角色圣经、歌词与作曲、卡点分镜、静帧、动态镜头、卡点剪辑、质检与导出、安装、更新），每个技能旁带参考文件；渲染工具 beatmap / songcut / plan / render / qc / fonts；3 首自合成 CC0 自带曲。
 - 流萤：Claude Code 改为可选。新增 matte.py（rembg 抠像，字压在人身后）、grade.py + 6 个 CC0 LUT、upscale.py（Real-ESRGAN 可选，默认 lanczos+锐化）；render.py 支持 lut / behind / lyrics（逐字歌词）/ hud / ticker（跑马灯）。没有机器时交剪映步骤。
 - 流萤：风格预设库（v11 同款为旗舰 + 赛博街头、国风、复古胶片、动漫、方块世界）；入门和剪辑全部改成选择题（提问组件，默认 v11 同款），成片后发改版勾选。
+- 流萤：默认动态字改为 Anton（与 v11 同款超粗窄体，OFL）+ 思源黑体 Heavy（中文），fonts.py 新机器自动下载，像素字体改用 GitHub releases 接口下载修好。
+- 流萤：补齐整条无人值守流程——state.py（进度/下一步/决定原话/关口/后台任务）、lyrics_align.py（歌词对时间）、audit.py（出片前自检 + 歌词关）；render.py 新增 punch_on（镜头跟鼓点顶）、--excerpt 片段先审、BT.709 标记；qc.py 新增闪烁检查、色彩标记检查、share 分享版；技能加入 4 张试镜图、钩子/主线/每句一个画面点子、自评分、发布文案、「好了说继续」等待规矩。
 - 新增 `RELEASE.md` 发布清单，含强制人工关口「新 Bot 导入测试」。
 - validate 新增发布检查（对每位灵）：店面介绍写明安装技能、仓库和标签；安装记忆 kind=profile；gettingStarted=<灵>-install；install.sh 标签和 VERSION 一致；人设和记忆含一行命令与配方地址；`--online` 检查配方可达。
 - 预算规则：合计只算 SKILL.md + profile + memory（≤80KB），参考文件单个 ≤12KB；profile 上限 4KB。
