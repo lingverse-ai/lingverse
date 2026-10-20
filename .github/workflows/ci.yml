@@ -10,9 +10,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: ffmpeg and numpy (ember tools)
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg fonts-noto-cjk && pip install numpy
       - name: validate
         run: python3 tools/validate.py
       - name: recipe is fresh
         run: python3 tools/pack.py --check
-      - name: tests
+      - name: tests (moling)
         run: python3 spirits/moling/tests/run_tests.py
+      - name: tests (ember)
+        run: python3 spirits/ember/tests/run_tests.py

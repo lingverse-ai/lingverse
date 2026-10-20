@@ -84,7 +84,7 @@ curl -fsSL https://raw.githubusercontent.com/lingverse-ai/lingverse/moling-v0.1.
 | 灵 | 职能 | 状态 |
 |---|---|---|
 | 墨灵 Moling | 长文 | ✅ v0.1.2 |
-| 流萤 Ember | MV | 筹备中 |
+| 流萤 Ember | MV | 开发中（v0.1.0 待发布） |
 | 朱砂 Cinnabar | 海报 | 筹备中 |
 | 听潮 Tide | 声音 | 筹备中 |
 | 算盘子 Abacus | 成交（XY Skill） | 筹备中 |

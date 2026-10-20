@@ -1,4 +1,5 @@
-"""仓库检查。用法：python3 tools/validate.py [仓库根目录]
+"""仓库检查。用法：python3 tools/validate.py [仓库根目录] [--online <spirit>]
+--online：发布时推完标签再跑，检查该灵的配方和 install.sh 在标签下能打开。
 失败时退出码为 1，并逐条列出问题。只用标准库。"""
 import hashlib, json, re, sys
 from pathlib import Path
@@ -83,9 +84,12 @@ def check_spirit(sp, errors, warns):
                 errors.append(f"[frontmatter] {d.name}: description 超过 {LIM['description_chars']} 字符")
         for extra in d.iterdir():
             b = extra.stat().st_size
-            total += b
-            if extra.name == "SKILL.md" and b > LIM["skill_bytes"]:
-                errors.append(f"[budget] {d.name}/SKILL.md {b} 字节 > {LIM['skill_bytes']}")
+            if extra.name == "SKILL.md":
+                total += b  # 合计只算导入时会回放的：SKILL.md + profile + memory
+                if b > LIM["skill_bytes"]:
+                    errors.append(f"[budget] {d.name}/SKILL.md {b} 字节 > {LIM['skill_bytes']}")
+            elif b > LIM["reference_bytes"]:
+                errors.append(f"[budget] {d.name}/{extra.name} 参考文件 {b} 字节 > {LIM['reference_bytes']}")
     if total > LIM["total_bytes"]:
         errors.append(f"[budget] {name} 合计 {total} 字节 > {LIM['total_bytes']}")
     # 交叉引用
@@ -120,9 +124,58 @@ def check_spirit(sp, errors, warns):
                 ratios = [r.group(0) for r in ratios if r]
                 if ratios and "cover" in c and ratios[0] != c["cover"]:
                     errors.append(f"[platform] {src}: {k} 封面写 {ratios[0]}，规格卡是 {c['cover']}")
-    else:
-        warns.append(f"[platform] {name}: 没找到 platforms.md")
+    release_checks(sp, ver, skill_names, errors)
     return total
+
+
+def release_checks(sp, ver, skill_names, errors, online=False):
+    """发布检查（RELEASE.md 第 1 节）：防止「分享卡里没有技能」再发生。对每一位灵都跑。"""
+    from pack import build
+    name, owner, repo = sp.name, CONFIG["github_owner"], CONFIG["repo"]
+    tag, inst = f"{name}-v{ver}", f"{name}-install"
+    raw = f"https://raw.githubusercontent.com/{owner}/{repo}/{tag}/spirits/{name}/dist"
+    E = lambda m: errors.append(f"[release] {name}: {m}")
+    if not (sp / "install.sh").exists():
+        return E("缺少 install.sh")
+    try:
+        out = {p.name: c for p, c in build(name).items()}
+    except Exception as e:  # 比如某个 SKILL.md 头部坏了：上面的 [frontmatter] 已经报过
+        return E(f"打包失败，先修上面的错误（{type(e).__name__}）")
+    tpl, rec, sh = json.loads(out["template.json"]), json.loads(out["recipe.json"]), out.get("install.sh", "")
+    if tpl.get("gettingStarted", {}).get("skill") != inst:
+        E(f"gettingStarted 必须是 {inst}")
+    card = {s["name"] for s in tpl.get("skills", [])}
+    if inst not in card or f"{name}-getting-started" not in card:
+        E(f"分享卡技能必须含 {inst} 和 {name}-getting-started")
+    mems = tpl.get("memory", [])
+    if not mems or any(m.get("kind") != "profile" for m in mems):
+        E("安装记忆必须是 kind=profile")
+    store = tpl.get("_meta", {}).get("storefront", "")
+    for need, what in ((inst, "安装技能名"), (f"github.com/{owner}/{repo}", "仓库"), (tag, "标签")):
+        if need not in store:
+            E(f"店面介绍（profile.description）没写{what} {need}")
+    if f"T={tag}" not in sh or "{{" in sh:
+        E(f"install.sh 的标签不是 {tag}（或还有没填的占位符）")
+    n = len(rec["skills"])
+    one_liner = f"{raw}/install.sh | bash"
+    for label, text in (("人设 instructions", tpl["profile"]["description"]), ("安装记忆", " ".join(m["content"] for m in mems))):
+        for need in (one_liner, f"{raw}/recipe.json", f"https://github.com/{owner}/{repo}", f"{n} 个技能"):
+            if need not in text:
+                E(f"{label} 缺少 {need}")
+    ic = next((s["content"] for s in rec["skills"] if s["name"] == inst), "")
+    for need in (one_liner, f"{raw}/recipe.json", "已装好 N 个技能", "NO_SKILL_DIR"):
+        if need not in ic:
+            E(f"{inst} 缺少 {need}")
+    if online:
+        import urllib.request
+        for u in (f"{raw}/recipe.json", f"{raw}/install.sh"):
+            try:
+                with urllib.request.urlopen(urllib.request.Request(u, method="HEAD"), timeout=15) as r:
+                    ok = r.status == 200
+            except Exception:
+                ok = False
+            if not ok:
+                E(f"配方地址打不开（标签推了吗？）：{u}")
 
 
 def main(root):
@@ -145,6 +198,9 @@ def main(root):
     for sp in sorted((root / "spirits").iterdir()):
         if sp.is_dir():
             totals[sp.name] = check_spirit(sp, errors, warns)
+    for sp in ONLINE:  # --online <spirit>：发布流程里，推完标签后检查配方能不能拉到
+        d = root / "spirits" / sp
+        release_checks(d, (d / "VERSION").read_text().strip(), set(), errors, online=True)
     if CONFIG["github_owner"] in ("", "OWNER_PENDING"):
         warns.append("[owner] tools/config.json 的 github_owner 还没定")
     for w in warns:
@@ -155,5 +211,10 @@ def main(root):
     return 1 if errors else 0
 
 
+ONLINE = []
+
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent))
+    a = sys.argv[1:]
+    if "--online" in a:  # python3 tools/validate.py --online ember
+        i = a.index("--online"); ONLINE.append(a[i + 1]); del a[i:i + 2]
+    sys.exit(main(a[0] if a else Path(__file__).resolve().parent.parent))

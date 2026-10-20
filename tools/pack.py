@@ -13,6 +13,9 @@ def build(spirit):
     sp = ROOT / "spirits" / spirit
     version = (sp / "VERSION").read_text().strip()
     subst = {"{{OWNER}}": CONFIG["github_owner"], "{{VERSION}}": version}
+    # install.sh 的 curl 兜底要逐个下载的工具和音乐文件（有 tools/、music/ 的灵才用得上）
+    for key, sub, pat in (("{{TOOL_FILES}}", "tools", "*.py"), ("{{MUSIC_FILES}}", "music", "*")):
+        subst[key] = " ".join(sorted(f.name for f in (sp / sub).glob(pat) if f.is_file())) if (sp / sub).is_dir() else ""
 
     def fill(t):
         for k, v in subst.items():
@@ -36,7 +39,8 @@ def build(spirit):
     card_skills = (f"{spirit}-install", f"{spirit}-getting-started")
     thin = {
         "profile": {"name": profile["name"], "description": profile["instructions"]},
-        "memory": [{"kind": "log", "content": memory}],
+        # 安装记忆必须是 profile 类：导入时一定带上（log 类可能被丢掉，v0.1.0 的教训）
+        "memory": [{"kind": "profile", "content": memory}],
         "skills": [{k: s[k] for k in ("name", "description", "content")} for s in skills if s["name"] in card_skills],
         "gettingStarted": {"skill": f"{spirit}-install"},
         "_meta": {"spirit": spirit, "version": version, "tag": recipe["tag"], "storefront": profile["description"]},

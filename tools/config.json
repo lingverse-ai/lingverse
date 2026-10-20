@@ -4,7 +4,8 @@
   "limits": {
     "skill_bytes": 6144,
     "total_bytes": 81920,
-    "profile_bytes": 3072,
+    "profile_bytes": 4096,
+    "reference_bytes": 12288,
     "description_chars": 400
   },
   "private_allow": {

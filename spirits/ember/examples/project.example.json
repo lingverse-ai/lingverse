@@ -1,0 +1,24 @@
+{
+ "_note": "虚构示例：16:9、1080p、10 秒，自带曲 ember-neon-140（140 BPM，一小节约 1.714s）。路径相对本文件。",
+ "size": [1920, 1080], "fps": 30, "duration": 10.0,
+ "audio": "../music/ember-neon-140.mp3", "audio_start": 3.428,
+ "shots": [
+  {"src": "INTRO_CARD", "in": 0, "out": 1.714},
+  {"src": "color:#1b1035", "in": 1.714, "out": 3.428},
+  {"src": "color:#0d3b4f", "in": 3.428, "out": 5.142},
+  {"src": "color:#3a0d2e", "in": 5.142, "out": 6.856},
+  {"src": "color:#ffffff", "in": 6.856, "out": 10.0}
+ ],
+ "words": [
+  {"t": 0.0, "until": 0.428, "text": "ONE", "size": 260},
+  {"t": 0.428, "until": 0.857, "text": "LINE", "size": 260, "box": "#FF2E88"},
+  {"t": 0.857, "until": 1.285, "text": "ONE", "size": 260, "color": "#FFE45C"},
+  {"t": 1.285, "until": 1.714, "text": "SONG", "size": 260},
+  {"t": 1.714, "until": 3.428, "text": "NIGHT", "color": "#FFE45C"},
+  {"t": 3.428, "until": 5.142, "text": "GLOW", "box": "#FF2E88"},
+  {"t": 5.142, "until": 6.856, "text": "MOVE", "pos": "bottom"}
+ ],
+ "flash_on": [1.714, 3.428, 5.142, 6.856], "glitch_on": [3.428],
+ "grain": 5, "fade": 0.6,
+ "endcard": {"from": 6.856, "text": "一句话变成歌", "sub": "LINGVERSE · EMBER"}
+}

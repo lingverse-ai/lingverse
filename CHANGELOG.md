@@ -2,6 +2,13 @@
 
 格式参考 Keep a Changelog；每位灵单独打标签（`<spirit>-vX.Y.Z`）。
 
+## 未发布（main）
+- 新增 流萤 Ember（`spirits/ember`，VERSION 0.1.0，标签待主人审完技能后再打）：10 个技能（入门、角色圣经、歌词与作曲、卡点分镜、静帧、动态镜头、卡点剪辑、质检与导出、安装、更新），每个技能旁带参考文件；渲染工具 beatmap / songcut / plan / render / qc / fonts；3 首自合成 CC0 自带曲。
+- 新增 `RELEASE.md` 发布清单，含强制人工关口「新 Bot 导入测试」。
+- validate 新增发布检查（对每位灵）：店面介绍写明安装技能、仓库和标签；安装记忆 kind=profile；gettingStarted=<灵>-install；install.sh 标签和 VERSION 一致；人设和记忆含一行命令与配方地址；`--online` 检查配方可达。
+- 预算规则：合计只算 SKILL.md + profile + memory（≤80KB），参考文件单个 ≤12KB；profile 上限 4KB。
+- 墨灵（下次发布 moling-v0.1.3 时生效）：分享卡安装记忆改为 kind=profile；店面介绍写明 moling-install、仓库和标签；moling-update 引用的安装步骤号修正为第 1～3 步。
+
 ## moling-v0.1.2 — 2026-10-20
 
 修复：导入后只带进一条记忆，技能正文没到，bot 找不到仓库。
