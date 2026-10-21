@@ -17,6 +17,9 @@ def build(spirit):
     for key, sub, pat in (("{{TOOL_FILES}}", "tools", "*.py"), ("{{MUSIC_FILES}}", "music", "*"), ("{{LUT_FILES}}", "luts", "*")):
         subst[key] = " ".join(sorted(f.name for f in (sp / sub).glob(pat) if f.is_file())) if (sp / sub).is_dir() else ""
 
+    v11 = sp / "tools" / "v11"
+    subst["{{V11_FILES}}"] = " ".join(sorted(str(f.relative_to(v11)) for f in v11.rglob("*") if f.is_file() and "__pycache__" not in f.parts and not f.name.startswith("._"))) if v11.is_dir() else ""
+
     def fill(t):
         for k, v in subst.items():
             t = t.replace(k, v)

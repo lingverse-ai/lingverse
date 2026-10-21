@@ -51,7 +51,7 @@ print(f"plan: {len(p['shots'])} 个镜头 ok")
 # 4. render：示例工程（半分辨率预览 + 粗剪），查分辨率和时长；qc PASS
 ex = SP / "examples" / "project.example.json"
 for flag, size in (("--preview", (960, 540)), ("--rough", (1920, 1080))):
-    out = tmp / f"r{flag}.mp4"; py(T / "render.py", ex, out, flag)
+    out = tmp / f"r{flag}.mp4"; py(T / "render_legacy.py", ex, out, flag)
     if out.exists():
         w, h, d = probe(out)
         if (w, h) != size or abs(d - 10) > 0.1: fails.append(f"render {flag}: {w}x{h} {d:.2f}s")
@@ -74,7 +74,7 @@ try:
     fx["shots"][2]["src"] = str(fr); fx["words"].append({"t": 3.5, "until": 5, "text": "BEHIND", "behind": True})
 except ImportError:
     print("（没装 rembg，跳过抠像测试）")
-fxj = tmp / "fx.json"; fxj.write_text(json.dumps(fx)); py(T / "render.py", fxj, tmp / "fx.mp4", "--preview")
+fxj = tmp / "fx.json"; fxj.write_text(json.dumps(fx)); py(T / "render_legacy.py", fxj, tmp / "fx.mp4", "--preview")
 if (tmp / "fx.mp4").exists(): print("fx render:", probe(tmp / "fx.mp4"))
 print("grade / upscale / fx ok" if not fails else "")
 
@@ -92,7 +92,7 @@ r = py(T / "audit.py", aj, "--words", tmp / "w.json")
 if "歌词关 2/2" not in r.stdout: fails.append("audit 歌词关没过：" + r.stdout[-200:])
 au["lyrics"] = []; aj.write_text(json.dumps(au))
 if subprocess.run([sys.executable, str(T / "audit.py"), str(aj), "--words", str(tmp / "w.json")], capture_output=True).returncode == 0: fails.append("audit 漏词没拦住")
-py(T / "render.py", aj, tmp / "ex.mp4", "--preview", "--excerpt", "2-6")
+py(T / "render_legacy.py", aj, tmp / "ex.mp4", "--preview", "--excerpt", "2-6")
 if not (tmp / "ex.mp4").exists() or abs(probe(tmp / "ex.mp4")[2] - 4) > 0.15: fails.append("--excerpt 片段长度不对")
 r = py(T / "qc.py", tmp / "ex.mp4", "--dur", "4")
 if "BT.709" in r.stdout or "闪烁" in r.stdout: fails.append("qc 色彩标记/闪烁误报：" + r.stdout[-200:])
@@ -113,7 +113,7 @@ shutil.copy(_ff("cn-kuaile"), cp / "fonts" / "My.ttf")
 cj = json.loads(ex.read_text()); cj["cn_font"] = "fonts/My.ttf"; cj["audio"] = str(M / "ember-neon-140.mp3"); cj["words"] = [{"t": 1, "until": 2, "text": "未来"}]
 for s_ in cj["shots"]:
     if s_.get("src") and not str(s_["src"]).startswith("/") and s_["src"] != "INTRO_CARD" and ":" not in str(s_["src"]): s_["src"] = str((ex.parent / s_["src"]).resolve())
-(cp / "p.json").write_text(json.dumps(cj, ensure_ascii=False)); py(T / "render.py", cp / "p.json", cp / "o.mp4", "--preview")
+(cp / "p.json").write_text(json.dumps(cj, ensure_ascii=False)); py(T / "render_legacy.py", cp / "p.json", cp / "o.mp4", "--preview")
 if not (cp / "o.mp4").exists(): fails.append("自己加字体 cn_font 渲染失败")
 print("lyrics_cn / cn fonts / 自带字体 ok" if not fails else "")
 
